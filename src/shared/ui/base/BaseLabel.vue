@@ -4,15 +4,15 @@ interface IProps {
   required?: boolean
 }
 
-const props = withDefaults(defineProps<IProps>(), {
-  for: '',
-  required: false
-})
+const {
+  for: htmlFor = '',
+  required = false
+} = defineProps<IProps>()
 </script>
 
 <template>
-  <label :for="props.for" class="text-sm font-medium text-gray-700">
+  <label :for="htmlFor" class="text-sm font-medium text-gray-700">
     <slot />
-    <span v-if="props.required" class="text-red-500 ml-0.5">*</span>
+    <span v-if="required" class="text-red-500 ml-0.5">*</span>
   </label>
 </template>

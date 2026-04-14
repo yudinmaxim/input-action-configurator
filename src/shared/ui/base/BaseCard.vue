@@ -4,23 +4,23 @@ interface IProps {
   padding?: 'none' | 'sm' | 'md' | 'lg'
 }
 
-const props = withDefaults(defineProps<IProps>(), {
-  title: '',
-  padding: 'md'
-})
+const {
+  title = '',
+  padding = 'md'
+} = defineProps<IProps>()
 </script>
 
 <template>
   <div
     class="bg-white border border-gray-200 rounded-md"
     :class="[
-      props.padding === 'none' && 'p-0',
-      props.padding === 'sm' && 'p-2',
-      props.padding === 'md' && 'p-4',
-      props.padding === 'lg' && 'p-6'
+      padding === 'none' && 'p-0',
+      padding === 'sm' && 'p-2',
+      padding === 'md' && 'p-4',
+      padding === 'lg' && 'p-6'
     ]"
   >
-    <h3 v-if="props.title" class="text-lg font-semibold text-gray-800 mb-4">{{ props.title }}</h3>
+    <h3 v-if="title" class="text-lg font-semibold text-gray-800 mb-4">{{ title }}</h3>
     <slot />
   </div>
 </template>

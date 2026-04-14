@@ -7,9 +7,9 @@ import {
   TriggerEvent,
   InputActionsConfig,
   MouseButton,
-  DEFAULT_DEVICE_PROPERTIES,
   TRIGGERS_BY_DEVICE,
-  TRIGGER_EVENTS
+  TRIGGER_EVENTS,
+  TriggerConfig
 } from '../types'
 
 const initialConfig = {
@@ -114,19 +114,16 @@ export const useConfigStore = () => {
     return result
   })
   
-  const selectedTrigger = computed(() => {
-    console.log('selectedTrigger recomputed', { device: state.selectedDevice, id: state.selectedTriggerId })
+  const selectedTrigger = computed<TriggerConfig | null>(() => {
     if (!state.selectedDevice || !state.selectedTriggerId) return null
     
     const deviceConfig = state.config.device?.[state.selectedDevice]
     if (!deviceConfig) return null
     
     const trigger = deviceConfig.find((t: any) => t.id === state.selectedTriggerId)
-    console.log('selectedTrigger found:', trigger?.id, 'actions:', trigger?.actions?.length, 'ref:', Object.prototype.toString.call(trigger))
     if (!trigger) return null
     
-    // Wrap in reactive to ensure Vue tracks it as reactive
-    return reactive(trigger)
+    return trigger as TriggerConfig
   })
   
   const availableTriggers = computed(() => {
@@ -145,19 +142,18 @@ export const useConfigStore = () => {
   }
   
   const setSelectedTrigger = (id: string | null) => {
-    console.log('setSelectedTrigger called', id)
     state.selectedTriggerId = id
   }
   
-  const addTrigger = (deviceType: DeviceType, trigger: any) => {
+  const addTrigger = (deviceType: DeviceType, trigger: TriggerConfig) => {
     if (!state.config.device) {
       state.config.device = {} as any
     }
-    if (!state.config.device[deviceType]) {
-      state.config.device[deviceType] = []
+    if (!state.config.device![deviceType]) {
+      state.config.device![deviceType] = [] as any[]
     }
-    state.config.device[deviceType].push(trigger)
-    state.selectedTriggerId = trigger.id
+    ;(state.config.device![deviceType] as any[]).push(trigger)
+    state.selectedTriggerId = trigger.id ?? null
     state.isDirty = true
   }
   

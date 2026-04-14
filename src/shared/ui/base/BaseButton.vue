@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 interface IProps {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
@@ -6,12 +6,12 @@ interface IProps {
   fullWidth?: boolean
 }
 
-const props = withDefaults(defineProps<IProps>(), {
-  variant: 'primary',
-  size: 'md',
-  disabled: false,
-  fullWidth: false
-})
+const {
+  variant = 'primary',
+  size = 'md',
+  disabled = false,
+  fullWidth = false
+} = defineProps<IProps>()
 
 const emit = defineEmits<{
   click: [event: MouseEvent]
@@ -33,10 +33,10 @@ const sizeClass = {
 
 <template>
   <button
-    class='inline-flex justify-center items-center px-4 py-2 rounded-md font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
-    :class='[variantClass[variant as keyof typeof variantClass], sizeClass[size as keyof typeof sizeClass], fullWidth ? &quot;w-full&quot; : &quot;&quot;]'
-    :disabled='props.disabled'
-    @click='emit(&quot;click&quot;, $event)'
+    class="inline-flex justify-center items-center rounded-md font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+    :class="[variantClass[variant as keyof typeof variantClass], sizeClass[size as keyof typeof sizeClass], fullWidth ? 'w-full' : '']"
+    :disabled="disabled"
+    @click="emit('click', $event)"
   >
     <slot />
   </button>

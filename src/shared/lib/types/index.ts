@@ -1093,7 +1093,7 @@ export enum ConditionOperator {
 /**
  * Single condition expression
  */
-export interface Condition {
+export interface ConditionExpression {
   /**
    * Variable or property to evaluate.
    * Can be:
@@ -1136,7 +1136,7 @@ export interface ConditionSet {
 /**
  * Complete condition type (can be simple or set)
  */
-export type Condition = Condition | ConditionSet;
+export type Condition = ConditionExpression | ConditionSet;
 
 // ============================================================================
 // SECTION 6: VARIABLE TYPES
@@ -1441,7 +1441,7 @@ export const TRIGGERS_BY_DEVICE: Record<DeviceType, TriggerType[]> = {
 /**
  * Required fields by trigger type
  */
-export const REQUIRED_FIELDS: Partial<Record<TriggerType, (keyof TriggerConfig)[]>> = {
+export const REQUIRED_FIELDS: Partial<Record<TriggerType, string[]>> = {
   [TriggerType.SHORTCUT]: ['keys'],
   [TriggerType.HOLD]: ['fingers'],
   [TriggerType.PINCH]: ['fingers'],

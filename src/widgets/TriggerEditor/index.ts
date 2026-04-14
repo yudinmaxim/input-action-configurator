@@ -1,0 +1,5 @@
+export { default as TriggerEditor } from './TriggerEditor.vue'
+export { default as BasicProperties } from './BasicProperties.vue'
+export { default as DirectionSettings } from './DirectionSettings.vue'
+export { default as ActionsEditor } from './ActionsEditor.vue'
+export { default as Options } from './Options.vue'
