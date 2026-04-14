@@ -4,6 +4,7 @@ import { useConfigStore } from '../shared/lib/stores/config'
 import { DeviceList } from '../widgets/DeviceList'
 import { TriggerList } from '../widgets/TriggerList'
 import { TriggerEditor } from '../widgets/TriggerEditor'
+import YamlPreview from '../widgets/YamlPreview/YamlPreview.vue'
 import { DeviceType } from '../shared/lib/stores/config'
 
 const store = useConfigStore()
@@ -83,6 +84,8 @@ const handleDeleteCurrentTrigger = () => {
       @add-action="handleAddAction"
       @delete-trigger="handleDeleteCurrentTrigger"
     />
+    
+    <YamlPreview />
   </div>
 </template>
 

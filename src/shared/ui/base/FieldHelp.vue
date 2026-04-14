@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-interface Props {
-  title?: string
-}
-
-defineProps<Props>()
-
 const show = ref(false)
 const timer = ref<number | null>(null)
 
@@ -39,7 +33,7 @@ const cancelClose = () => {
       @mouseenter="cancelClose"
       @mouseleave="close"
     >
-      <div v-if="title" class="font-medium mb-1">{{ title }}</div>
+      <div v-if="$slots.title" class="font-medium mb-1"><slot name="title" /></div>
       <div class="leading-relaxed"><slot /></div>
     </div>
   </div>
