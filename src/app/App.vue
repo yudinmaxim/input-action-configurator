@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useConfigStore } from '../shared/lib/stores/config'
 import { DeviceList } from '../widgets/DeviceList'
 import { TriggerList } from '../widgets/TriggerList'
@@ -8,6 +8,17 @@ import YamlPreview from '../widgets/YamlPreview/YamlPreview.vue'
 import { DeviceType } from '../shared/lib/stores/config'
 
 const store = useConfigStore()
+
+onMounted(async () => {
+  try {
+    const result = await store.loadFromFile()
+    if (!result.success) {
+      console.warn('Failed to load config:', result.error)
+    }
+  } catch (e) {
+    console.warn('Cannot load config (Tauri not running):', e)
+  }
+})
 
 const selectedDevice = computed(() => store.state.selectedDevice)
 const selectedTriggerId = computed(() => store.state.selectedTriggerId)
@@ -56,10 +67,30 @@ const handleDeleteCurrentTrigger = () => {
   if (!store.state.selectedDevice || !store.state.selectedTriggerId) return
   store.deleteTrigger(store.state.selectedDevice, store.state.selectedTriggerId)
 }
+
+const handleSave = async () => {
+  try {
+    const result = await store.saveToFile()
+    if (!result.success) {
+      console.warn('Failed to save:', result.error)
+    }
+  } catch (e) {
+    console.warn('Cannot save config:', e)
+  }
+}
 </script>
 
 <template>
   <div class="flex h-screen bg-gray-50">
+    <div class="p-2 border-b bg-white">
+      <button 
+        class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md font-medium"
+        @click="handleSave"
+      >
+        Save
+      </button>
+    </div>
+    
     <DeviceList
       :selected-device="selectedDevice"
       @select-device="handleSelectDevice"

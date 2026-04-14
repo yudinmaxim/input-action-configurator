@@ -1,4 +1,5 @@
 import { reactive, computed } from 'vue'
+import yaml from 'js-yaml'
 import { 
   DeviceType, 
   TriggerType, 
@@ -11,6 +12,7 @@ import {
   TRIGGER_EVENTS,
   TriggerConfig
 } from '../types'
+import { readConfig, writeConfig, type ConfigResult } from '../../api/config'
 
 const initialConfig = {
   device: {
@@ -223,6 +225,34 @@ export const useConfigStore = () => {
     state.isDirty = false
   }
   
+  const loadFromFile = async (): Promise<ConfigResult> => {
+    try {
+      const result = await readConfig()
+      if (result.success && result.content) {
+        const parsed = yaml.load(result.content)
+        if (parsed && typeof parsed === 'object') {
+          loadConfig(parsed as InputActionsConfig)
+        }
+      }
+      return result
+    } catch (e) {
+      return { success: false, content: null, error: String(e) }
+    }
+  }
+  
+  const saveToFile = async (): Promise<ConfigResult> => {
+    try {
+      const configYaml = yaml.dump(state.config, { lineWidth: -1, noRefs: true })
+      const result = await writeConfig(configYaml)
+      if (result.success) {
+        state.isDirty = false
+      }
+      return result
+    } catch (e) {
+      return { success: false, content: null, error: String(e) }
+    }
+  }
+  
   return {
     state,
     devices,
@@ -238,7 +268,9 @@ export const useConfigStore = () => {
     updateAction,
     deleteAction,
     getConfig,
-    loadConfig
+    loadConfig,
+    loadFromFile,
+    saveToFile
   }
 }
 
