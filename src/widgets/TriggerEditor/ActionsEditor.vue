@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { TriggerEventOptions } from '../../shared/lib/stores/config'
 import { BaseButton, BaseInput, BaseSelect, BaseLabel } from '../../shared/ui/base'
+import InputActionEditor from './InputActionEditor.vue'
 
 interface ActionItem {
   on: string
@@ -77,6 +78,11 @@ const addNewAction = () => {
           />
           
           <div class="col-span-2">
+            <InputActionEditor
+              v-if="action.input"
+              :action-item="action.input[0]"
+              @update="(item) => emit('update-action', index, { input: [item] })"
+            />
             <BaseLabel v-if="action.command !== undefined">Command</BaseLabel>
             <BaseInput
               v-if="action.command !== undefined"

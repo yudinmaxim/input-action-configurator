@@ -31,3 +31,13 @@ npm run tauri:build # Desktop production build
 - `src/shared/lib/stores/config.ts` - Reactive state and CRUD operations
 - `src/app/App.vue` - Three-panel layout
 - `src-tauri/tauri.conf.json` - Desktop app config
+
+## input-actions wiki
+
+https://wiki.inputactions.org/v0.9.0/conditions/group.html
+https://github.com/InputActions/wiki
+
+### input actions source kwin
+
+https://github.com/InputActions/kwin
+

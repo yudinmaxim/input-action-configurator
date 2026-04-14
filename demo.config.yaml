@@ -1,0 +1,56 @@
+device_rules:
+  - conditions: "$name == HID 05ac:0265 Touchpad"
+    buttonpad: true
+
+touchpad:
+  gestures:
+    # Shift + жест одним пальцем = движение мыши с зажатой ЛКМ
+    - type: swipe
+      direction: any
+      fingers: 1
+      resume_timeout: 50
+      conditions:
+        - any:
+            - $window_class == kompas.exe
+            - $window_class == OrcaSlicer
+        - $keyboard_modifiers == [ shift ]
+
+      actions:
+        - on: begin
+          input:
+            - mouse: [ +middle ]
+
+        - on: update
+          input:
+            - mouse: [ move_by_delta ]
+
+        - on: end_cancel
+          input:
+            - mouse: [ -middle ]
+
+    - type: swipe
+      fingers: 1
+      direction: any
+      resume_timeout: 50
+      conditions:
+        - any:
+            - $window_class == kompas.exe
+            - $window_class == OrcaSlicer
+        - $keyboard_modifiers == [ alt ]
+      block_events: true
+
+      actions:
+        - on: begin
+          input:
+            - mouse: [ +right ]
+
+        - on: update
+          input:
+            - mouse: [ move_by_delta ]
+
+        - on: end_cancel
+          input:
+            - mouse: [ -right ]
+
+keyboard:
+  gestures: []

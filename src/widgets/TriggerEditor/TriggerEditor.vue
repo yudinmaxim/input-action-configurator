@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { BaseButton } from '../../shared/ui/base'
-import { BasicProperties, DirectionSettings, ActionsEditor, Options } from '../TriggerEditor'
+import { BasicProperties, DirectionSettings, ActionsEditor, Options, ConditionsEditor } from '../TriggerEditor'
 
 interface Props {
   selectedDevice: string | null
@@ -41,6 +41,11 @@ const emit = defineEmits<{
         <DirectionSettings
           :selected-trigger="selectedTrigger"
           :selected-device="selectedDevice"
+          @update-field="(field, value) => emit('update-field', field, value)"
+        />
+        
+        <ConditionsEditor
+          :selected-trigger="selectedTrigger"
           @update-field="(field, value) => emit('update-field', field, value)"
         />
         
