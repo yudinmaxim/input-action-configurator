@@ -262,48 +262,56 @@ any: [$window_class==firefox, $window_class==chrome]
       </div>
       
       <div class="flex flex-wrap gap-2">
-        <FieldHelp class="text-sm">
-          <template #title>Простое условие</template>
-          Проверяет $переменная == значение
-        </FieldHelp>
         <button 
-          class="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md text-sm font-medium"
+          class="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md text-sm font-medium flex items-center"
           @click="doAddSimple"
         >
           + condition
+          <span @click.stop>
+            <FieldHelp class="text-sm ml-1">
+              <template #title>Простое условие</template>
+              Проверяет $переменная == значение
+            </FieldHelp>
+          </span>
         </button>
         
-        <FieldHelp class="text-sm">
-          <template #title>Любое из списка</template>
-          Активируется, если хотя бы одно выполняется
-        </FieldHelp>
         <button 
-          class="px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-700 rounded-md text-sm font-medium"
+          class="px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-700 rounded-md text-sm font-medium flex items-center"
           @click="doAddGroup('any')"
         >
           + any
+          <span @click.stop>
+            <FieldHelp class="text-sm ml-1">
+              <template #title>Любое из списка</template>
+              Активируется, если хотя бы одно выполняется
+            </FieldHelp>
+          </span>
         </button>
         
-        <FieldHelp class="text-sm">
-          <template #title>Все из списка</template>
-          Активируется только если все выполняются
-        </FieldHelp>
         <button 
-          class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-md text-sm font-medium"
+          class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-md text-sm font-medium flex items-center"
           @click="doAddGroup('all')"
         >
           + all
+          <span @click.stop>
+            <FieldHelp class="text-sm ml-1">
+              <template #title>Все из списка</template>
+              Активируется только если все выполняются
+            </FieldHelp>
+          </span>
         </button>
         
-        <FieldHelp class="text-sm">
-          <template #title>Ни одно из списка</template>
-          Активируется если ни одно не выполняется
-        </FieldHelp>
         <button 
-          class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md text-sm font-medium"
+          class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md text-sm font-medium flex items-center"
           @click="doAddGroup('none')"
         >
           + none
+          <span @click.stop>
+            <FieldHelp class="text-sm ml-1">
+              <template #title>Ни одно из списка</template>
+              Активируется если ни одно не выполняется
+            </FieldHelp>
+          </span>
         </button>
       </div>
       
