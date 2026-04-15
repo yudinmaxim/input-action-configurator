@@ -13,6 +13,7 @@ import {
   TriggerConfig
 } from '../types'
 import { readConfig, writeConfig, type ConfigResult } from '../../api/config'
+import { parseInputActionsConfig, dumpInputActionsConfig } from '../yaml-converter'
 
 const initialConfig = {
   device: {
@@ -229,9 +230,15 @@ export const useConfigStore = () => {
     try {
       const result = await readConfig()
       if (result.success && result.content) {
-        const parsed = yaml.load(result.content)
-        if (parsed && typeof parsed === 'object') {
-          loadConfig(parsed as InputActionsConfig)
+        try {
+          const parsed = parseInputActionsConfig(result.content)
+          loadConfig(parsed)
+        } catch (parseError) {
+          // Если парсинг не удался, пробуем старый формат
+          const parsed = yaml.load(result.content)
+          if (parsed && typeof parsed === 'object') {
+            loadConfig(parsed as InputActionsConfig)
+          }
         }
       }
       return result
@@ -242,7 +249,7 @@ export const useConfigStore = () => {
   
   const saveToFile = async (): Promise<ConfigResult> => {
     try {
-      const configYaml = yaml.dump(state.config, { lineWidth: -1, noRefs: true })
+      const configYaml = dumpInputActionsConfig(state.config)
       const result = await writeConfig(configYaml)
       if (result.success) {
         state.isDirty = false
