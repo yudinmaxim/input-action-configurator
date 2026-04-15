@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { BaseInput, BaseSelect, BaseCard } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
+import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
 
 interface GroupCondition {
   groupType: 'any' | 'all' | 'none'
@@ -26,6 +27,49 @@ const emit = defineEmits<{
 }>()
 
 const list = ref<ConditionItem[]>([])
+
+// Вычисляем модификаторы из условий
+const keyboardModifiers = computed({
+  get: () => {
+    const modifierCondition = list.value.find(c => 
+      isSimple(c) && c.variable === '$keyboard_modifiers'
+    ) as SimpleCondition | undefined
+    
+    if (!modifierCondition?.value) return []
+    
+    // Парсим значение: "[ shift ]" или "[shift, ctrl]"
+    const match = modifierCondition.value.match(/\[(.*?)\]/)
+    if (!match) return []
+    
+    return match[1]
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
+  },
+  set: (newModifiers: string[]) => {
+    const modifiersStr = newModifiers.length > 0 ? `[ ${newModifiers.join(', ')} ]` : ''
+    
+    // Находим или создаем условие для модификаторов
+    const modifierIndex = list.value.findIndex(c => 
+      isSimple(c) && c.variable === '$keyboard_modifiers'
+    )
+    
+    if (newModifiers.length > 0) {
+      if (modifierIndex !== -1) {
+        // Обновляем существующее условие
+        (list.value[modifierIndex] as SimpleCondition).value = modifiersStr
+      } else {
+        // Добавляем новое условие
+        list.value.push({ variable: '$keyboard_modifiers', value: modifiersStr })
+      }
+    } else if (modifierIndex !== -1) {
+      // Удаляем условие если модификаторов нет
+      list.value.splice(modifierIndex, 1)
+    }
+    
+    saveConditions()
+  }
+})
 
 const VARIABLES = [
   { value: '$window_class', label: '$window_class' },
@@ -215,45 +259,45 @@ any: [$window_class==firefox, $window_class==chrome]
 <template>
   <BaseCard title="Conditions">
     <div class="flex flex-col gap-2">
-      <div v-for="(c, i) in list" :key="i" 
-        class="flex flex-col gap-2 p-3 rounded-lg border"
-        :class="TYPE_COLORS[getRootType(c)]"
-      >
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-medium" :class="{
-            'text-blue-600': getRootType(c) === 'condition',
-            'text-green-600': getRootType(c) === 'any',
-            'text-amber-600': getRootType(c) === 'all',
-            'text-red-600': getRootType(c) === 'none',
-          }">{{ TYPE_LABELS[getRootType(c)] }}</span>
-          <button class="text-red-500 text-sm" @click="remove(i)">✕</button>
-        </div>
-        
-        <template v-if="isGroup(c)">
-          <div class="flex flex-col gap-1">
-            <div v-for="(sub, subI) in (getGroup(c).conditions || [])" :key="subI" class="flex gap-2">
-              <BaseSelect
-                :model-value="sub.variable || ''"
-                :options="VARIABLES"
-                placeholder="$var"
-                class="w-40"
-                @update:model-value="(v) => onSubVar(i, subI, v)"
-              />
-              <BaseInput
-                :model-value="sub.value"
-                placeholder="значение"
-                class="flex-1"
-                @update:model-value="(v) => onSubVal(i, subI, v)"
-              />
-              <button class="text-red-500 text-sm" @click="removeSub(i, subI)">✕</button>
-            </div>
-            <button class="text-xs text-blue-500 text-left" @click="addSub(i)">
-              + добавить условие
-            </button>
+        <div v-for="(c, i) in list" :key="i" 
+          class="flex flex-col gap-2 p-3 rounded-lg border"
+          :class="TYPE_COLORS[getRootType(c)]"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium" :class="{
+              'text-blue-600': getRootType(c) === 'condition',
+              'text-green-600': getRootType(c) === 'any',
+              'text-amber-600': getRootType(c) === 'all',
+              'text-red-600': getRootType(c) === 'none',
+            }">{{ TYPE_LABELS[getRootType(c)] }}</span>
+            <button class="text-red-500 text-sm" @click="remove(i)">✕</button>
           </div>
-        </template>
-        
-        <template v-else>
+          
+          <template v-if="isGroup(c)">
+            <div class="flex flex-col gap-1">
+              <div v-for="(sub, subI) in (getGroup(c).conditions || [])" :key="subI" class="flex gap-2">
+                <BaseSelect
+                  :model-value="sub.variable || ''"
+                  :options="VARIABLES"
+                  placeholder="$var"
+                  class="w-40"
+                  @update:model-value="(v) => onSubVar(i, subI, v)"
+                />
+                <BaseInput
+                  :model-value="sub.value"
+                  placeholder="значение"
+                  class="flex-1"
+                  @update:model-value="(v) => onSubVal(i, subI, v)"
+                />
+                <button class="text-red-500 text-sm" @click="removeSub(i, subI)">✕</button>
+              </div>
+              <button class="text-xs text-blue-500 text-left" @click="addSub(i)">
+                + добавить условие
+              </button>
+            </div>
+          </template>
+          
+          <template v-else>
           <div class="flex items-end gap-2">
             <BaseSelect
               :model-value="getSimple(c).variable || ''"
@@ -263,7 +307,14 @@ any: [$window_class==firefox, $window_class==chrome]
               @update:model-value="(v) => onVar(i, v)"
             />
             <span class="text-gray-400">==</span>
+            <template v-if="getSimple(c).variable === '$keyboard_modifiers'">
+              <KeyboardModifierToggles
+                v-model="keyboardModifiers"
+                class="flex-1"
+              />
+            </template>
             <BaseInput
+              v-else
               :model-value="getSimple(c).value"
               placeholder="значение"
               class="flex-1"

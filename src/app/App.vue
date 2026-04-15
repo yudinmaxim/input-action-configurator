@@ -9,6 +9,7 @@ import { DeviceType } from '../shared/lib/stores/config'
 import BaseButton from '../shared/ui/base/BaseButton.vue'
 import BaseDropdown from '../shared/ui/base/BaseDropdown.vue'
 import BaseDropdownItem from '../shared/ui/base/BaseDropdownItem.vue'
+import BaseResizablePanel from '../shared/ui/base/BaseResizablePanel.vue'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 
 const store = useConfigStore()
@@ -30,6 +31,9 @@ const selectedTriggerId = computed(() => store.state.selectedTriggerId)
 const selectedTrigger = store.selectedTrigger
 const currentActions = computed(() => selectedTrigger.value?.actions || [])
 const isDirty = computed(() => store.state.isDirty)
+
+// Resizable panel state
+const triggerListWidth = ref(300)
 
 // Add device dropdown state
 const selectedDeviceType = ref<DeviceType | ''>('')
@@ -240,30 +244,41 @@ const confirmAddDevice = (deviceType: string | number) => {
       @select-device="handleSelectDevice"
     />
     
-    <!-- Main content area -->
-    <div class="flex flex-1 overflow-hidden">
-      <TriggerList
-        :selected-device="selectedDevice"
-        :selected-trigger-id="selectedTriggerId"
-        @select-trigger="handleSelectTrigger"
-        @add-trigger="handleAddTrigger"
-        @delete-trigger="handleDeleteTrigger"
-      />
+    <!-- Main content area with resizable panel -->
+    <BaseResizablePanel 
+      :initial-width="triggerListWidth"
+      :min-width="200"
+      :max-width="500"
+      @update:width="triggerListWidth = $event"
+    >
+      <template #default>
+        <TriggerList
+          :selected-device="selectedDevice"
+          :selected-trigger-id="selectedTriggerId"
+          @select-trigger="handleSelectTrigger"
+          @add-trigger="handleAddTrigger"
+          @delete-trigger="handleDeleteTrigger"
+        />
+      </template>
       
-      <TriggerEditor
-        :selected-device="selectedDevice"
-        :selected-trigger-id="selectedTriggerId"
-        :selected-trigger="selectedTrigger"
-        :actions="currentActions"
-        @update-field="handleUpdateTriggerField"
-        @update-action="handleUpdateAction"
-        @delete-action="handleDeleteAction"
-        @add-action="handleAddAction"
-        @delete-trigger="handleDeleteCurrentTrigger"
-      />
-      
-      <YamlPreview />
-    </div>
+      <template #right>
+        <div class="flex flex-1 overflow-hidden">
+          <TriggerEditor
+            :selected-device="selectedDevice"
+            :selected-trigger-id="selectedTriggerId"
+            :selected-trigger="selectedTrigger"
+            :actions="currentActions"
+            @update-field="handleUpdateTriggerField"
+            @update-action="handleUpdateAction"
+            @delete-action="handleDeleteAction"
+            @add-action="handleAddAction"
+            @delete-trigger="handleDeleteCurrentTrigger"
+          />
+          
+          <YamlPreview />
+        </div>
+      </template>
+    </BaseResizablePanel>
   </div>
 </template>
 

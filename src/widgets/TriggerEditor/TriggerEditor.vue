@@ -31,7 +31,7 @@ const emit = defineEmits<{
         Select a trigger to edit
       </div>
       
-      <div v-else class="flex flex-col gap-6">
+      <div v-else :key="selectedTrigger.id" class="flex flex-col gap-6">
         <BasicProperties
           :selected-trigger="selectedTrigger"
           :selected-device="selectedDevice"

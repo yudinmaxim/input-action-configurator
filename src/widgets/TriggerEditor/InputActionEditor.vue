@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { BaseInput, BaseButton, BaseSelect } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
+import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
 
 interface Props {
   actionItem: {
@@ -15,6 +16,35 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'update': [item: { keyboard?: string[], mouse?: string[] }]
 }>()
+
+// Извлекаем модификаторы из keyboard массива
+const modifiers = computed({
+  get: () => {
+    if (!props.actionItem.keyboard) return []
+    return props.actionItem.keyboard
+      .map(k => {
+        // Убираем префиксы +, -
+        const clean = k.replace(/^[+-]/, '')
+        return clean.toLowerCase()
+      })
+      .filter(k => ['ctrl', 'alt', 'shift', 'meta', 'leftctrl', 'leftalt', 'leftshift', 'rightctrl', 'rightalt', 'rightshift'].includes(k))
+  },
+  set: (newModifiers: string[]) => {
+    // Сохраняем только модификаторы, остальные actions оставляем как есть
+    const otherActions = props.actionItem.keyboard?.filter(k => {
+      const clean = k.replace(/^[+-]/, '').toLowerCase()
+      return !['ctrl', 'alt', 'shift', 'meta', 'leftctrl', 'leftalt', 'leftshift', 'rightctrl', 'rightalt', 'rightshift'].includes(clean)
+    }) || []
+    
+    const modifierActions = newModifiers.map(m => `+${m}`)
+    const combined = [...modifierActions, ...otherActions]
+    
+    emit('update', {
+      keyboard: combined.length ? combined : undefined,
+      mouse: props.actionItem.mouse
+    })
+  }
+})
 
 const keyboardActions = ref<string[]>(props.actionItem.keyboard || [])
 const mouseActions = ref<string[]>(props.actionItem.mouse || [])
@@ -170,6 +200,13 @@ const removeMouseAction = (i: number) => {
         <span class="text-sm font-medium text-gray-700">Keyboard</span>
         <FieldHelp>{{ keyboardHelp }}</FieldHelp>
       </div>
+      
+      <!-- Keyboard Modifiers Toggles -->
+      <div class="mb-3">
+        <label class="block text-xs font-medium text-gray-500 mb-1">Modifiers</label>
+        <KeyboardModifierToggles v-model="modifiers" />
+      </div>
+      
       <div class="flex flex-col gap-2">
         <div v-for="(_, i) in keyboardState" :key="i" class="flex gap-2 items-center">
           <BaseSelect
