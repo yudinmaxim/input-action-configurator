@@ -65,6 +65,14 @@ function isSimple(c: ConditionItem): c is SimpleCondition {
 function syncList() {
   const raw = props.selectedTrigger?.conditions || []
   list.value = parseConditions(raw)
+
+  console.log('Conditions parced list ', list.value)
+}
+
+const checkVariableName = (variable: string) => {
+  if (variable.startsWith('$')) return variable
+
+  return `$${variable}`
 }
 
 function parseConditions(raw: any[]): ConditionItem[] {
@@ -72,8 +80,8 @@ function parseConditions(raw: any[]): ConditionItem[] {
     if (typeof item === 'string') {
       // Поддерживаем: $var == value, var == value, $var == "value with spaces"
       const match = item.match(/^\$?([\w.-]+)\s*==\s*(.+)$/)
-      if (match) return { variable: match[1], value: match[2].replace(/^["']|["']$/g, '') }
-      return { variable: item, value: '' }
+      if (match) return { variable: checkVariableName(match[1]), value: match[2].replace(/^["']|["']$/g, '') }
+      return { variable: checkVariableName(item), value: '' }
     }
     if (typeof item === 'object' && item !== null) {
       if (item.any) return { groupType: 'any' as const, conditions: parseSub(item.any) }
@@ -89,8 +97,8 @@ function parseSub(raw: any[]): { variable: string, value: string }[] {
     const str = String(item)
     const match = str.match(/^\$?([\w.-]+)\s*==\s*(.+)$/)
     return match 
-      ? { variable: match[1], value: match[2].replace(/^["']|["']$/g, '') } 
-      : { variable: str, value: '' }
+      ? { variable: checkVariableName(match[1]), value: match[2].replace(/^["']|["']$/g, '') } 
+      : { variable: checkVariableName(str), value: '' }
   })
 }
 
