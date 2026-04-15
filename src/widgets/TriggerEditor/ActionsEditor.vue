@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { BaseInput, BaseSelect, BaseCard } from '../../shared/ui/base'
+import { BaseInput, BaseSelect } from '../../shared/ui/base'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 
@@ -15,6 +15,9 @@ interface ActionItem {
   input?: InputEntry[]
   shortcut?: string
   time?: number
+  interval?: number | string
+  threshold?: number
+  conditions?: any[]
 }
 
 interface Props {
@@ -267,11 +270,22 @@ keyboard:
 command - shell command
 shortcut - Plasma shortcut
 sleep - milliseconds
+
+Special (for update/tick):
+  interval: +  - positive (wheel up, volume up)
+  interval: -  - negative (wheel down, volume down)
+  interval: N  - numeric value
+  threshold: N - delay before repeating
 `
 </script>
 
 <template>
-  <BaseCard title="Actions">
+  <div class="bg-white border border-gray-200 rounded-md p-4">
+    <div class="flex items-center gap-2 mb-4">
+      <h3 class="text-lg font-semibold text-gray-800">Actions</h3>
+      <FieldHelp><slot>{{ helpText }}</slot></FieldHelp>
+    </div>
+    
     <div class="flex flex-col gap-3">
       <div v-for="(action, actionIndex) in list" :key="actionIndex" 
         class="flex flex-col gap-3 p-3 rounded-lg border"
@@ -307,6 +321,33 @@ sleep - milliseconds
             class="w-28"
             @update:model-value="(v) => updateActionType(actionIndex, String(v))"
           />
+          
+          <!-- Interval для update/tick событий -->
+          <template v-if="action.on === 'update' || action.on === 'tick'">
+            <span class="text-gray-400">|</span>
+            <BaseInput
+              :model-value="action.interval !== undefined ? String(action.interval) : ''"
+              placeholder="interval"
+              class="w-20"
+              @update:model-value="(v) => {
+                const val = String(v).trim()
+                emit('update-action', actionIndex, { 
+                  interval: val === '' || val === '+' || val === '-' ? val || undefined : Number(val) 
+                })
+              }"
+            />
+            <BaseInput
+              :model-value="action.threshold !== undefined ? String(action.threshold) : ''"
+              placeholder="threshold"
+              class="w-20"
+              @update:model-value="(v) => {
+                const val = String(v).trim()
+                emit('update-action', actionIndex, { 
+                  threshold: val === '' ? undefined : Number(val) 
+                })
+              }"
+            />
+          </template>
         </div>
         
         <!-- Input entries -->
@@ -519,8 +560,6 @@ sleep - milliseconds
           + {{ EVENT_LABELS['tick'] }}
         </button>
       </div>
-      
-      <FieldHelp><slot>{{ helpText }}</slot></FieldHelp>
     </div>
-  </BaseCard>
+  </div>
 </template>

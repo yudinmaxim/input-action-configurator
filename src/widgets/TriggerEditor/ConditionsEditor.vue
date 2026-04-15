@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { BaseInput, BaseSelect, BaseCard } from '../../shared/ui/base'
+import { BaseInput, BaseSelect } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
 
@@ -257,7 +257,12 @@ any: [$window_class==firefox, $window_class==chrome]
 </script>
 
 <template>
-  <BaseCard title="Conditions">
+  <div class="bg-white border border-gray-200 rounded-md p-4">
+    <div class="flex items-center gap-2 mb-4">
+      <h3 class="text-lg font-semibold text-gray-800">Conditions</h3>
+      <FieldHelp><slot>{{ helpText }}</slot></FieldHelp>
+    </div>
+    
     <div class="flex flex-col gap-2">
         <div v-for="(c, i) in list" :key="i" 
           class="flex flex-col gap-2 p-3 rounded-lg border"
@@ -377,8 +382,6 @@ any: [$window_class==firefox, $window_class==chrome]
           </span>
         </button>
       </div>
-      
-      <FieldHelp><slot>{{ helpText }}</slot></FieldHelp>
     </div>
-  </BaseCard>
+  </div>
 </template>
