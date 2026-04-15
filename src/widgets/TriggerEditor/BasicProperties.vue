@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BaseInput, BaseSelect } from '../../shared/ui/base'
+import { BaseInput, BaseSelect, BaseCard } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 
 interface Props {

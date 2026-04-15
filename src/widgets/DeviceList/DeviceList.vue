@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { useConfigStore } from '../../shared/lib/stores/config'
+import { BaseTabs, BaseTab, BaseModal } from '../../shared/ui/base'
+import { DeviceType } from '../../shared/lib/types'
 
 defineProps<{
   selectedDevice: string | null
@@ -11,6 +14,28 @@ const emit = defineEmits<{
 
 const store = useConfigStore()
 
+const devices = computed(() => store.devices.value)
+const deletingDevice = ref<string | null>(null)
+const showDeleteModal = ref(false)
+
+const handleTabChange = (deviceId: string) => {
+  emit('select-device', deviceId)
+}
+
+const handleTabDelete = (deviceId: string) => {
+  deletingDevice.value = deviceId
+  showDeleteModal.value = true
+}
+
+const confirmDelete = () => {
+  if (deletingDevice.value) {
+    const deviceType = deletingDevice.value as DeviceType
+    store.deleteDevice(deviceType)
+  }
+  showDeleteModal.value = false
+  deletingDevice.value = null
+}
+
 const getDeviceIcon = (type: string) => {
   const icons: Record<string, string> = {
     keyboard: '⌨️',
@@ -20,29 +45,51 @@ const getDeviceIcon = (type: string) => {
   }
   return icons[type] || '📦'
 }
+
+const getDeviceLabel = (type: string) => {
+  const labels: Record<string, string> = {
+    keyboard: 'Keyboard',
+    mouse: 'Mouse',
+    touchpad: 'Touchpad',
+    touchscreen: 'Touchscreen'
+  }
+  return labels[type] || type
+}
 </script>
 
 <template>
-  <div class="w-64 border-r border-gray-200 bg-white flex flex-col">
-    <div class="p-4 border-b border-gray-200">
-      <h2 class="text-lg font-semibold text-gray-800">Devices</h2>
-    </div>
-    <div class="flex-1 overflow-y-auto p-2">
-      <div
-        v-for="device in store.devices.value"
-        :key="device.type"
-        class="mb-2"
-      >
-        <div
-          class="flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer transition-colors"
-          :class="selectedDevice === device.type ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100 text-gray-700'"
-          @click="emit('select-device', device.type)"
+  <div>
+    <BaseTabs :model-value="selectedDevice" @update:model-value="handleTabChange">
+      <template #default>
+        <BaseTab
+          v-for="device in devices"
+          :key="device.type"
+          :id="device.type"
+          :icon="getDeviceIcon(device.type)"
+          :label="getDeviceLabel(device.type)"
+          deletable
+          @delete="handleTabDelete(device.type)"
         >
-          <span>{{ getDeviceIcon(device.type) }}</span>
-          <span class="flex-1 font-medium">{{ device.type }}</span>
-          <span class="text-xs text-gray-400">({{ device.triggers.length }})</span>
-        </div>
-      </div>
-    </div>
+          <template #badge>
+            <span 
+              class="text-xs px-2 py-0.5 rounded-full"
+              :class="selectedDevice === device.type ? 'bg-blue-200 text-blue-700' : 'bg-gray-200 text-gray-600'"
+            >
+              {{ device.triggers.length }}
+            </span>
+          </template>
+        </BaseTab>
+      </template>
+    </BaseTabs>
+
+    <BaseModal
+      v-model="showDeleteModal"
+      title="Удалить устройство"
+      :message="`Вы уверены, что хотите удалить устройство '${getDeviceLabel(deletingDevice || '')}' и все его триггеры? Это действие нельзя отменить.`"
+      confirm-text="Удалить"
+      cancel-text="Отмена"
+      confirm-variant="danger"
+      @confirm="confirmDelete"
+    />
   </div>
 </template>

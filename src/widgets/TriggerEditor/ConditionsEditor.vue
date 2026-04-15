@@ -70,8 +70,9 @@ function syncList() {
 function parseConditions(raw: any[]): ConditionItem[] {
   return raw.map((item: any) => {
     if (typeof item === 'string') {
-      const match = item.match(/^\$?(\w+)\s*==\s*(.+)$/)
-      if (match) return { variable: match[1], value: match[2] }
+      // Поддерживаем: $var == value, var == value, $var == "value with spaces"
+      const match = item.match(/^\$?([\w.-]+)\s*==\s*(.+)$/)
+      if (match) return { variable: match[1], value: match[2].replace(/^["']|["']$/g, '') }
       return { variable: item, value: '' }
     }
     if (typeof item === 'object' && item !== null) {
@@ -85,8 +86,11 @@ function parseConditions(raw: any[]): ConditionItem[] {
 
 function parseSub(raw: any[]): { variable: string, value: string }[] {
   return raw.map((item: string) => {
-    const match = String(item).match(/^\$?(\w+)\s*==\s*(.+)$/)
-    return match ? { variable: match[1], value: match[2] } : { variable: String(item), value: '' }
+    const str = String(item)
+    const match = str.match(/^\$?([\w.-]+)\s*==\s*(.+)$/)
+    return match 
+      ? { variable: match[1], value: match[2].replace(/^["']|["']$/g, '') } 
+      : { variable: str, value: '' }
   })
 }
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { TriggerEventOptions } from '../../shared/lib/stores/config'
-import { BaseButton, BaseInput, BaseSelect, BaseLabel } from '../../shared/ui/base'
+import { BaseButton, BaseInput, BaseSelect, BaseLabel, BaseCard } from '../../shared/ui/base'
 import InputActionEditor from './InputActionEditor.vue'
 
 interface ActionItem {

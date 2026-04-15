@@ -101,16 +101,17 @@ export const useConfigStore = () => {
   const devices = computed(() => {
     const result: { type: DeviceType; triggers: any[] }[] = []
     
-    if (state.config.device?.keyboard) {
+    // Проверяем, существует ли устройство в config (даже если массив пустой)
+    if (state.config.device?.keyboard !== undefined) {
       result.push({ type: DeviceType.KEYBOARD, triggers: state.config.device.keyboard })
     }
-    if (state.config.device?.mouse) {
+    if (state.config.device?.mouse !== undefined) {
       result.push({ type: DeviceType.MOUSE, triggers: state.config.device.mouse })
     }
-    if (state.config.device?.touchpad) {
+    if (state.config.device?.touchpad !== undefined) {
       result.push({ type: DeviceType.TOUCHPAD, triggers: state.config.device.touchpad })
     }
-    if (state.config.device?.touchscreen) {
+    if (state.config.device?.touchscreen !== undefined) {
       result.push({ type: DeviceType.TOUCHSCREEN, triggers: state.config.device.touchscreen })
     }
     
@@ -182,6 +183,17 @@ export const useConfigStore = () => {
         state.selectedTriggerId = null
       }
       state.isDirty = true
+    }
+  }
+  
+  const deleteDevice = (deviceType: DeviceType) => {
+    if (state.config.device?.[deviceType]) {
+      state.config.device[deviceType] = []
+      state.isDirty = true
+    }
+    if (state.selectedDevice === deviceType) {
+      state.selectedDevice = null
+      state.selectedTriggerId = null
     }
   }
   
@@ -271,6 +283,7 @@ export const useConfigStore = () => {
     addTrigger,
     updateTrigger,
     deleteTrigger,
+    deleteDevice,
     addAction,
     updateAction,
     deleteAction,

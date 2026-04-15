@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SwipeDirectionOptions, CircleDirectionOptions, MouseButtonOptions } from '../../shared/lib/stores/config'
-import { BaseSelect, BaseCheckbox } from '../../shared/ui/base'
+import { BaseSelect, BaseCheckbox, BaseCard } from '../../shared/ui/base'
 
 interface Props {
   selectedTrigger: any

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BaseCheckbox } from '../../shared/ui/base'
+import { BaseCheckbox, BaseCard } from '../../shared/ui/base'
 
 interface Props {
   selectedTrigger: any
