@@ -13,7 +13,7 @@ const yamlOutput = computed(() => {
 </script>
 
 <template>
-  <div class="w-80 border-l border-gray-200 bg-slate-900 flex flex-col h-full">
+  <div class="w-full h-full flex flex-col bg-slate-900">
     <div class="p-4 border-b border-gray-700">
       <h2 class="text-lg font-semibold text-gray-200">YAML Preview</h2>
     </div>
