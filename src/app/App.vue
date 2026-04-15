@@ -32,9 +32,8 @@ const selectedTrigger = store.selectedTrigger
 const currentActions = computed(() => selectedTrigger.value?.actions || [])
 const isDirty = computed(() => store.state.isDirty)
 
-// Widths for three columns
+// Width for left column
 const triggerListWidth = ref(300)
-const editorWidth = ref(400)
 
 // Add device dropdown state
 const selectedDeviceType = ref<DeviceType | ''>('')
@@ -248,13 +247,9 @@ const confirmAddDevice = (deviceType: string | number) => {
     <!-- Three column layout with resizable panels -->
     <BaseThreeColumnPanel
       :col1-width="triggerListWidth"
-      :col2-width="editorWidth"
       :col1-min="200"
       :col1-max="500"
-      :col2-min="300"
-      :col2-max="600"
       @update:col1-width="triggerListWidth = $event"
-      @update:col2-width="editorWidth = $event"
     >
       <template #col1>
         <TriggerList

@@ -21,17 +21,25 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex-1 flex flex-col overflow-hidden">
-    <div class="p-4 border-b border-gray-200 bg-white">
+  <div class="flex-1 flex flex-col overflow-hidden h-full">
+    <div class="p-4 border-b border-gray-200 bg-white flex justify-between items-center">
       <h2 class="text-lg font-semibold text-gray-800">Trigger Editor</h2>
+      <BaseButton 
+        v-if="selectedTrigger" 
+        variant="danger" 
+        size="sm"
+        @click="emit('delete-trigger')"
+      >
+        Delete Trigger
+      </BaseButton>
     </div>
     
-    <div class="flex-1 overflow-y-auto p-4">
+    <div class="flex-1 min-h-0 overflow-y-auto p-4 pb-8">
       <div v-if="!selectedTrigger" class="text-center text-gray-500 py-8">
         Select a trigger to edit
       </div>
       
-      <div v-else :key="selectedTrigger.id" class="flex flex-col gap-6">
+      <div v-else :key="selectedTrigger.id" class="flex flex-col gap-6 mb-24">
         <BasicProperties
           :selected-trigger="selectedTrigger"
           :selected-device="selectedDevice"
@@ -62,12 +70,6 @@ const emit = defineEmits<{
           :selected-trigger="selectedTrigger"
           @update-field="(field, value) => emit('update-field', field, value)"
         />
-        
-        <div class="flex justify-end">
-          <BaseButton variant="danger" @click="emit('delete-trigger')">
-            Delete Trigger
-          </BaseButton>
-        </div>
       </div>
     </div>
   </div>

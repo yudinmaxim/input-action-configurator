@@ -102,19 +102,31 @@ function convertGestureToTrigger(gesture: any, deviceType: DeviceType, index: nu
 
 /**
  * Конвертация input action
+ * Формат YAML: input: [{ mouse: ['+middle'] }, { keyboard: ['+ctrl'] }]
  */
 function convertActionInput(input: any): any {
   if (!input) return {}
   
-  const result: any = {}
-  for (const item of input) {
-    if (item.mouse) {
-      result.mouse = item.mouse
-    }
-    if (item.keyboard) {
-      result.keyboard = item.keyboard
+  const result: any = { input: [] }
+  
+  if (Array.isArray(input)) {
+    for (const item of input) {
+      if (item && typeof item === 'object') {
+        // YAML парсит как: - mouse: [+middle]
+        // или: - keyboard: [+ctrl]
+        for (const [key, value] of Object.entries(item)) {
+          if (key === 'mouse' || key === 'keyboard') {
+            result.input.push({ [key]: value })
+          }
+        }
+      }
     }
   }
+  
+  if (result.input.length === 0) {
+    delete result.input
+  }
+  
   return result
 }
 
@@ -184,12 +196,17 @@ function convertTriggerToGesture(trigger: TriggerConfig, deviceType: DeviceType)
     type: trigger.type,
     id: trigger.id,
     actions: trigger.actions?.map(action => {
+      // action.input это массив [{ mouse: [...] }, { keyboard: [...] }]
       const inputActions: any[] = []
-      if (action.mouse) {
-        inputActions.push({ mouse: action.mouse })
-      }
-      if (action.keyboard) {
-        inputActions.push({ keyboard: action.keyboard })
+      if (action.input && Array.isArray(action.input)) {
+        for (const item of action.input) {
+          if (item.mouse) {
+            inputActions.push({ mouse: item.mouse })
+          }
+          if (item.keyboard) {
+            inputActions.push({ keyboard: item.keyboard })
+          }
+        }
       }
       return {
         on: action.on,

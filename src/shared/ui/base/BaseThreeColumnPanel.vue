@@ -3,36 +3,25 @@ import { ref } from 'vue'
 
 interface Props {
   col1Width?: number
-  col2Width?: number
   col1Min?: number
   col1Max?: number
-  col2Min?: number
-  col2Max?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
   col1Width: 300,
-  col2Width: 400,
   col1Min: 200,
-  col1Max: 500,
-  col2Min: 300,
-  col2Max: 600
+  col1Max: 500
 })
 
 const emit = defineEmits<{
   'update:col1Width': [width: number]
-  'update:col2Width': [width: number]
 }>()
 
 const col1Width = ref(props.col1Width)
-const col2Width = ref(props.col2Width)
 const isResizing1 = ref(false)
-const isResizing2 = ref(false)
 
 let startX1 = 0
 let startCol1Width = 0
-let startX2 = 0
-let startCol2Width = 0
 
 // Слайдер между колонкой 1 и 2
 const handleMouseDown1 = (e: MouseEvent) => {
@@ -68,49 +57,12 @@ const handleMouseUp1 = () => {
   document.body.style.userSelect = ''
 }
 
-// Слайдер между колонкой 2 и 3
-const handleMouseDown2 = (e: MouseEvent) => {
-  e.preventDefault()
-  e.stopPropagation()
-  
-  isResizing2.value = true
-  startX2 = e.clientX
-  startCol2Width = col2Width.value
-  
-  document.addEventListener('mousemove', handleMouseMove2)
-  document.addEventListener('mouseup', handleMouseUp2)
-  document.body.style.cursor = 'col-resize'
-  document.body.style.userSelect = 'none'
-}
-
-const handleMouseMove2 = (e: MouseEvent) => {
-  if (!isResizing2.value) return
-  
-  const delta = e.clientX - startX2
-  let newCol2Width = startCol2Width + delta
-  
-  newCol2Width = Math.max(props.col2Min, Math.min(props.col2Max, newCol2Width))
-  col2Width.value = newCol2Width
-  emit('update:col2Width', newCol2Width)
-}
-
-const handleMouseUp2 = () => {
-  isResizing2.value = false
-  document.removeEventListener('mousemove', handleMouseMove2)
-  document.removeEventListener('mouseup', handleMouseUp2)
-  document.body.style.cursor = ''
-  document.body.style.userSelect = ''
-}
-
 // Очистка
 const stopAllResizing = () => {
-  if (isResizing1.value || isResizing2.value) {
+  if (isResizing1.value) {
     isResizing1.value = false
-    isResizing2.value = false
     document.removeEventListener('mousemove', handleMouseMove1)
-    document.removeEventListener('mousemove', handleMouseMove2)
     document.removeEventListener('mouseup', handleMouseUp1)
-    document.removeEventListener('mouseup', handleMouseUp2)
     document.body.style.cursor = ''
     document.body.style.userSelect = ''
   }
@@ -118,9 +70,8 @@ const stopAllResizing = () => {
 
 // Обработка изменения размера окна
 const handleWindowResize = () => {
-  // Ограничиваем ширину при изменении размера окна
-  col1Width.value = Math.min(col1Width.value, props.col1Max)
-  col2Width.value = Math.min(col2Width.value, props.col2Max)
+  // Ограничиваем ширину col1 при изменении размера окна
+  col1Width.value = Math.max(props.col1Min, Math.min(col1Width.value, props.col1Max))
 }
 
 import { onMounted, onUnmounted } from 'vue'
@@ -140,7 +91,7 @@ onUnmounted(() => {
     <!-- Колонка 1 -->
     <div 
       class="col1 h-full overflow-hidden"
-      :style="{ width: `${col1Width}px`, flexShrink: 0 }"
+      :style="{ width: `${col1Width}px`, minWidth: `${props.col1Min}px`, flexShrink: 1 }"
     >
       <slot name="col1" />
     </div>
@@ -156,23 +107,13 @@ onUnmounted(() => {
     
     <!-- Колонка 2 -->
     <div 
-      class="col2 h-full overflow-hidden"
-      :style="{ width: `${col2Width}px`, flexShrink: 0 }"
+      class="col2 h-full overflow-hidden flex-1 min-w-0"
     >
       <slot name="col2" />
     </div>
     
-    <!-- Слайдер 2 -->
-    <div 
-      class="resizer"
-      :class="{ 'resizing': isResizing2 }"
-      @mousedown="handleMouseDown2"
-    >
-      <div class="resizer-line" />
-    </div>
-    
     <!-- Колонка 3 -->
-    <div class="col3 flex-1 h-full overflow-hidden">
+    <div class="col3 h-full overflow-hidden" style="width: 25%; min-width: 250px; flex-shrink: 0;">
       <slot name="col3" />
     </div>
   </div>

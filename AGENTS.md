@@ -17,6 +17,7 @@ npm run tauri:build # Desktop production build
 - **Entry point:** `src/main.ts` (not main.js)
 - **Config location:** `~/.config/inputactions/config.yaml`
 - **Reactivity quirk:** When switching triggers in list, use `:key` on TriggerEditor container to force re-render (known Vue reactivity issue with nested objects)
+- **Type checking:** Uses `vue-tsc --noEmit` (not tsc directly)
 
 ## Tech Stack
 
@@ -31,13 +32,26 @@ npm run tauri:build # Desktop production build
 - `src/shared/lib/stores/config.ts` - Reactive state and CRUD operations
 - `src/app/App.vue` - Three-panel layout
 - `src-tauri/tauri.conf.json` - Desktop app config
+- `src/shared/yaml-converter.ts` - YAML parsing/serialization utils
+- `uno.config.ts` - UnoCSS configuration
 
-## input-actions wiki
+## Development Workflow
 
-https://wiki.inputactions.org/v0.9.0/conditions/group.html
-https://github.com/InputActions/wiki
+1. For UI changes: `npm run dev`
+2. For type safety: `npm run type-check`
+3. For desktop testing: `npm run tauri:dev`
+4. For production: `npm run tauri:build`
 
-### input actions source kwin
+## Configuration Format
 
-https://github.com/InputActions/kwin
+- Uses YAML format for config persistence
+- Uses js-yaml library for parsing
+- Custom type validation in `yaml-converter.ts`
+- Default config stored in store until saved to file
 
+## Data Model
+
+- Config structure: `{ device: { [DeviceType]: TriggerConfig[] }, device_rules: [], settings: {} }`
+- Device types: KEYBOARD, MOUSE, TOUCHPAD, TOUCHSCREEN
+- Trigger types: SWIPE, CIRCLE, HOLD, TAP, CLICK, STROKE, PINCH, ROTATE, WHEEL, PRESS, SHORTCUT
+- Trigger events: BEGIN, UPDATE, TICK, END, CANCEL, END_CANCEL
