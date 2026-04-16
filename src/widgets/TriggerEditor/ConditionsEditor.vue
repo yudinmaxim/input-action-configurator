@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { BaseInput, BaseSelect, BaseButton } from '../../shared/ui/base'
+import { BaseInput, BaseSelect } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
-import AppSelectorModal from './AppSelectorModal.vue'
+import { getActiveWindow } from '../../entities/window-detector'
 
 interface GroupCondition {
   groupType: 'any' | 'all' | 'none'
@@ -29,9 +29,12 @@ const emit = defineEmits<{
 
 const list = ref<ConditionItem[]>([])
 
-const showAppSelector = ref(false)
+const showCountdown = ref(false)
+const countdown = ref(3)
 const appSelectorIndex = ref<number | null>(null)
 const appSelectorSubIndex = ref<number | null>(null)
+
+let countdownInterval: ReturnType<typeof setInterval> | null = null
 
 // Вычисляем модификаторы из условий
 const keyboardModifiers = computed({
@@ -244,12 +247,6 @@ function getGroup(c: ConditionItem): GroupCondition {
   return c as GroupCondition
 }
 
-const openAppSelector = (index: number, subIndex: number | null = null) => {
-  appSelectorIndex.value = index
-  appSelectorSubIndex.value = subIndex
-  showAppSelector.value = true
-}
-
 const getWindowProperty = (index: number, subIndex: number | null): 'class' | 'name' | 'caption' => {
   let variable = ''
   if (subIndex !== null && isGroup(list.value[index])) {
@@ -284,16 +281,51 @@ const getConditionDescription = (type: string): string => {
   return descriptions[type] || ''
 }
 
-const onAppSelected = (className: string) => {
-  if (appSelectorIndex.value !== null) {
-    if (appSelectorSubIndex.value !== null) {
-      onSubVal(appSelectorIndex.value, appSelectorSubIndex.value, className)
-    } else {
-      onVal(appSelectorIndex.value, className)
+const startCountdown = (index: number, subIndex: number | null = null) => {
+  appSelectorIndex.value = index
+  appSelectorSubIndex.value = subIndex
+  showCountdown.value = true
+  countdown.value = 3
+  
+  countdownInterval = setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      if (countdownInterval) {
+        clearInterval(countdownInterval)
+        countdownInterval = null
+      }
+      showCountdown.value = false
+      finishPicking()
     }
-    appSelectorIndex.value = null
-    appSelectorSubIndex.value = null
+  }, 1000)
+}
+
+const cancelCountdown = () => {
+  if (countdownInterval) {
+    clearInterval(countdownInterval)
+    countdownInterval = null
   }
+  showCountdown.value = false
+  countdown.value = 3
+  appSelectorIndex.value = null
+  appSelectorSubIndex.value = null
+}
+
+const finishPicking = async () => {
+  const window = await getActiveWindow()
+  const property = getWindowProperty(appSelectorIndex.value ?? 0, appSelectorSubIndex.value)
+  const value = window[property as keyof typeof window]
+  
+  if (value) {
+    if (appSelectorSubIndex.value !== null) {
+      onSubVal(appSelectorIndex.value!, appSelectorSubIndex.value, value)
+    } else {
+      onVal(appSelectorIndex.value!, value)
+    }
+  }
+  
+  appSelectorIndex.value = null
+  appSelectorSubIndex.value = null
 }
 
 const WINDOW_VARIABLES = ['$window_class', '$window_name', '$window_title', '$screen_name']
@@ -363,14 +395,17 @@ any: [$window_class==firefox, $window_class==chrome]
                   class="flex-1"
                   @update:model-value="(v) => onSubVal(i, subI, v)"
                 />
-                <BaseButton 
+                <button 
                   v-if="WINDOW_VARIABLES.includes(sub.variable)"
-                  size="sm"
-                  variant="secondary"
-                  @click="openAppSelector(i, subI)"
+                  class="app-btn"
+                  title="Кликните, затем переключитесь на нужное окно. После клика у вас будет 3 секунды на активацию нужного приложения."
+                  @click="startCountdown(i, subI)"
                 >
-                  📱
-                </BaseButton>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2"/>
+                    <path d="M8 21h8M12 17v4"/>
+                  </svg>
+                </button>
                 <button class="delete-btn" @click="removeSub(i, subI)">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -406,14 +441,22 @@ any: [$window_class==firefox, $window_class==chrome]
               class="flex-1"
               @update:model-value="(v) => onVal(i, v)"
             />
-            <BaseButton 
+            <button 
               v-if="WINDOW_VARIABLES.includes(getSimple(c).variable)"
-              size="sm"
-              variant="secondary"
-              @click="openAppSelector(i)"
+              class="app-btn"
+              title="Кликните, затем переключитесь на нужное окно. После клика у вас будет 3 секунды на активацию нужного приложения."
+              @click="startCountdown(i)"
             >
-              📱
-            </BaseButton>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                <path d="M8 21h8M12 17v4"/>
+              </svg>
+            </button>
+            <button class="delete-btn" @click="remove(i)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
           </div>
         </template>
       </div>
@@ -473,11 +516,25 @@ any: [$window_class==firefox, $window_class==chrome]
       </div>
     </div>
     
-    <AppSelectorModal
-      v-model="showAppSelector"
-      :window-property="getWindowProperty(appSelectorIndex ?? 0, appSelectorSubIndex)"
-      @select="onAppSelected"
-    />
+    <Teleport to="body">
+      <Transition name="fade">
+        <div 
+          v-if="showCountdown"
+          class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/80 cursor-pointer"
+          @click="cancelCountdown"
+        >
+          <div class="text-9xl font-bold text-white mb-8">
+            {{ countdown }}
+          </div>
+          <div class="text-xl text-gray-300 mb-4">
+            Переключитесь на нужное окно
+          </div>
+          <div class="text-sm text-gray-500">
+            Кликните в любое место для отмены
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -551,5 +608,37 @@ any: [$window_class==firefox, $window_class==chrome]
 }
 .add-btn-red:hover {
   background: #fecaca;
+}
+
+.app-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: #e5e7eb;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.app-btn:hover {
+  background: #d1d5db;
+}
+
+.app-btn:active {
+  transform: scale(0.9);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
