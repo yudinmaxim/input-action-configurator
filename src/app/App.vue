@@ -161,11 +161,10 @@ const confirmAddDevice = (deviceType: string | number) => {
   }
   store.state.config.device![type] = []
   store.state.isDirty = true
-  console.log('Device config after add:', store.state.config.device)
+  store.saveToHistory()
   
   // Select the new device
   store.setSelectedDevice(type)
-  console.log('Selected device:', store.state.selectedDevice)
 }
 
 const showConfigPreview = ref(false)

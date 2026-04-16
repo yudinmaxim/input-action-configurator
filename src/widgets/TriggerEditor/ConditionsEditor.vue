@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { BaseInput, BaseSelect } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
@@ -35,6 +35,10 @@ const appSelectorIndex = ref<number | null>(null)
 const appSelectorSubIndex = ref<number | null>(null)
 
 let countdownInterval: ReturnType<typeof setInterval> | null = null
+
+watch(() => props.selectedTrigger?.conditions, () => {
+  syncList()
+}, { deep: true })
 
 // Вычисляем модификаторы из условий
 const keyboardModifiers = computed({
@@ -173,7 +177,9 @@ function saveConditions() {
   emit('update-field', 'conditions', serialized.length ? serialized : undefined)
 }
 
-syncList()
+onMounted(() => {
+  syncList()
+})
 
 const doAddSimple = () => {
   list.value.push({ variable: '', value: '' })

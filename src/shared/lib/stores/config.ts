@@ -344,7 +344,8 @@ export const useConfigStore = () => {
     undo,
     redo,
     canUndo,
-    canRedo
+    canRedo,
+    saveToHistory
   }
 }
 
