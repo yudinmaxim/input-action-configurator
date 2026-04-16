@@ -30,13 +30,16 @@ const selectedTriggerTriggers = computed(() => {
   <div class="w-full h-full flex flex-col border-r border-gray-200 bg-white">
     <div class="p-4 border-b border-gray-200 flex justify-between items-center flex-shrink-0">
       <h2 class="text-lg font-semibold text-gray-800">Triggers</h2>
-      <BaseButton
+      <button 
         v-if="selectedDevice"
-        size="sm"
+        class="icon-btn"
+        title="Добавить триггер"
         @click="showNewTriggerForm = true"
       >
-        + Add
-      </BaseButton>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+      </button>
     </div>
     
     <!-- New Trigger Form -->
@@ -64,3 +67,27 @@ const selectedTriggerTriggers = computed(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: #f3f4f6;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.icon-btn:hover {
+  background: #e5e7eb;
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+</style>

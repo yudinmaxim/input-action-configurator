@@ -39,13 +39,45 @@ const isSelected = (mod: string) => selected.value.includes(mod)
     <button
       v-for="mod in modifiers"
       :key="mod"
-      class="px-3 py-1.5 rounded-md text-sm font-medium transition-all"
-      :class="isSelected(mod)
-        ? 'bg-blue-500 text-white hover:bg-blue-600 shadow-sm'
-        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'"
+      class="mod-btn"
+      :class="isSelected(mod) ? 'mod-btn-selected' : ''"
       @click="toggleModifier(mod)"
     >
       {{ mod }}
     </button>
   </div>
 </template>
+
+<style scoped>
+.mod-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mod-btn:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.mod-btn:active {
+  transform: scale(0.95);
+}
+
+.mod-btn-selected {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.mod-btn-selected:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+</style>

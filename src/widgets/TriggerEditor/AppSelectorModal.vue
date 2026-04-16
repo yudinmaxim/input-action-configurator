@@ -255,7 +255,7 @@ const close = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .close-btn:hover {
@@ -264,6 +264,6 @@ const close = () => {
 }
 
 .close-btn:active {
-  background: rgba(156, 163, 175, 0.5);
+  transform: scale(0.9);
 }
 </style>

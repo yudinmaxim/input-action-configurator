@@ -328,7 +328,7 @@ const removeMouseAction = (i: number) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .delete-btn:hover {
@@ -337,6 +337,6 @@ const removeMouseAction = (i: number) => {
 }
 
 .delete-btn:active {
-  background: rgba(239, 68, 68, 0.25);
+  transform: scale(0.9);
 }
 </style>

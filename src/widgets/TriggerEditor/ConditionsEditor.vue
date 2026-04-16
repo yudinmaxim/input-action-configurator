@@ -394,7 +394,7 @@ any: [$window_class==firefox, $window_class==chrome]
       
       <div class="flex flex-wrap gap-2">
         <button 
-          class="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md text-sm font-medium flex items-center"
+          class="add-btn add-btn-blue"
           @click="doAddSimple"
         >
           + condition
@@ -407,7 +407,7 @@ any: [$window_class==firefox, $window_class==chrome]
         </button>
         
         <button 
-          class="px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-700 rounded-md text-sm font-medium flex items-center"
+          class="add-btn add-btn-green"
           @click="doAddGroup('any')"
         >
           + any
@@ -420,7 +420,7 @@ any: [$window_class==firefox, $window_class==chrome]
         </button>
         
         <button 
-          class="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-md text-sm font-medium flex items-center"
+          class="add-btn add-btn-amber"
           @click="doAddGroup('all')"
         >
           + all
@@ -433,7 +433,7 @@ any: [$window_class==firefox, $window_class==chrome]
         </button>
         
         <button 
-          class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-md text-sm font-medium flex items-center"
+          class="add-btn add-btn-red"
           @click="doAddGroup('none')"
         >
           + none
@@ -467,7 +467,7 @@ any: [$window_class==firefox, $window_class==chrome]
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .delete-btn:hover {
@@ -476,6 +476,54 @@ any: [$window_class==firefox, $window_class==chrome]
 }
 
 .delete-btn:active {
-  background: rgba(239, 68, 68, 0.25);
+  transform: scale(0.9);
+}
+
+.add-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.15s ease;
+}
+
+.add-btn:active {
+  transform: scale(0.95);
+}
+
+.add-btn-blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+.add-btn-blue:hover {
+  background: #bfdbfe;
+}
+
+.add-btn-green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.add-btn-green:hover {
+  background: #bbf7d0;
+}
+
+.add-btn-amber {
+  background: #fef3c7;
+  color: #d97706;
+}
+.add-btn-amber:hover {
+  background: #fde68a;
+}
+
+.add-btn-red {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.add-btn-red:hover {
+  background: #fecaca;
 }
 </style>

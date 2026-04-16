@@ -63,6 +63,19 @@ const EVENT_COLORS_TEXT: Record<string, string> = {
   'end_cancel': 'text-orange-600',
 }
 
+const ADD_BTN_COLORS: Record<string, string> = {
+  'begin': 'add-btn-blue',
+  'update': 'add-btn-green',
+  'tick': 'add-btn-amber',
+  'end': 'add-btn-purple',
+  'cancel': 'add-btn-red',
+  'end_cancel': 'add-btn-orange',
+}
+
+function getAddBtnClass(event: string): string {
+  return ADD_BTN_COLORS[event] || 'add-btn-gray'
+}
+
 function syncList() {
   list.value = (props.actions || []).map(a => ({ ...a })) as ActionItem[]
 }
@@ -483,7 +496,7 @@ Special (for update/tick):
                   </div>
                   
                   <button 
-                    class="text-xs text-blue-500 text-left"
+                    class="add-small-btn"
                     @click="() => {
                       const actions = [...(entry.mouse || []), '+left']
                       updateMouseActions(actionIndex, entryIndex, actions)
@@ -498,13 +511,13 @@ Special (for update/tick):
             <!-- Add input entry -->
             <div class="flex gap-2">
               <button 
-                class="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-xs border"
+                class="add-small-btn"
                 @click="addInputEntry(actionIndex, 'keyboard')"
               >
                 + ⌨️ Keyboard
               </button>
               <button 
-                class="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-xs border"
+                class="add-small-btn"
                 @click="addInputEntry(actionIndex, 'mouse')"
               >
                 + 🖱️ Mouse
@@ -554,15 +567,15 @@ Special (for update/tick):
         <button 
           v-for="event in ['begin', 'update', 'end', 'cancel', 'end_cancel']"
           :key="event"
-          class="px-3 py-1.5 rounded-md text-sm font-medium border"
-          :class="EVENT_COLORS[event].replace('bg-', 'hover:bg-').replace('-50', '-100')"
+          class="add-btn"
+          :class="getAddBtnClass(event)"
           @click="addAction(event)"
         >
           + {{ EVENT_LABELS[event] }}
         </button>
         
         <button 
-          class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm font-medium border border-gray-300"
+          class="add-btn add-btn-gray"
           @click="addAction('tick')"
         >
           + {{ EVENT_LABELS['tick'] }}
@@ -584,7 +597,7 @@ Special (for update/tick):
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .delete-btn:hover {
@@ -593,6 +606,96 @@ Special (for update/tick):
 }
 
 .delete-btn:active {
-  background: rgba(239, 68, 68, 0.25);
+  transform: scale(0.9);
+}
+
+.add-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.add-btn:active {
+  transform: scale(0.95);
+}
+
+.add-btn-blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+.add-btn-blue:hover {
+  background: #bfdbfe;
+}
+
+.add-btn-green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.add-btn-green:hover {
+  background: #bbf7d0;
+}
+
+.add-btn-amber {
+  background: #fef3c7;
+  color: #d97706;
+}
+.add-btn-amber:hover {
+  background: #fde68a;
+}
+
+.add-btn-red {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.add-btn-red:hover {
+  background: #fecaca;
+}
+
+.add-btn-purple {
+  background: #f3e8ff;
+  color: #9333ea;
+}
+.add-btn-purple:hover {
+  background: #e9d5ff;
+}
+
+.add-btn-orange {
+  background: #ffedd5;
+  color: #ea580c;
+}
+.add-btn-orange:hover {
+  background: #fed7aa;
+}
+
+.add-btn-gray {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+.add-btn-gray:hover {
+  background: #e5e7eb;
+}
+
+.add-small-btn {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  background: #f3f4f6;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.add-small-btn:hover {
+  background: #e5e7eb;
+}
+
+.add-small-btn:active {
+  transform: scale(0.95);
 }
 </style>

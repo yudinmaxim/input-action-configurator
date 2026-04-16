@@ -18,10 +18,10 @@ const emit = defineEmits<{
 }>()
 
 const variantClass = {
-  primary: 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700',
-  secondary: 'bg-gray-100 text-gray-800 hover:bg-gray-200 active:bg-gray-300 border border-gray-300',
-  danger: 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700',
-  ghost: 'bg-transparent text-gray-600 hover:bg-gray-100 active:bg-gray-200'
+  primary: 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 active:scale-95',
+  secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400 active:scale-95',
+  danger: 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700 active:scale-95',
+  ghost: 'bg-transparent text-gray-600 hover:bg-gray-100 active:bg-gray-200 active:scale-95'
 }
 
 const sizeClass = {
@@ -33,7 +33,7 @@ const sizeClass = {
 
 <template>
   <button
-    class="inline-flex justify-center items-center rounded-md font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+    class="inline-flex justify-center items-center rounded-md font-medium transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
     :class="[variantClass[variant as keyof typeof variantClass], sizeClass[size as keyof typeof sizeClass], fullWidth ? 'w-full' : '']"
     :disabled="disabled"
     @click="emit('click', $event)"

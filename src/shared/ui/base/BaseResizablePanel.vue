@@ -95,7 +95,7 @@ defineExpose({ isResizing })
     </div>
     
     <!-- Правая панель (занимает всё оставшееся место) -->
-    <div class="right-panel h-full overflow-hidden">
+    <div class="right-panel h-full overflow-hidden w-full">
       <slot name="right" />
     </div>
   </div>

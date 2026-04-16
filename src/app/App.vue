@@ -6,7 +6,6 @@ import { TriggerList } from '../widgets/TriggerList'
 import { TriggerEditor } from '../widgets/TriggerEditor'
 import ConfigPreviewModal from '../widgets/ConfigPreviewModal.vue'
 import { DeviceType } from '../shared/lib/stores/config'
-import BaseButton from '../shared/ui/base/BaseButton.vue'
 import BaseDropdown from '../shared/ui/base/BaseDropdown.vue'
 import BaseDropdownItem from '../shared/ui/base/BaseDropdownItem.vue'
 import BaseResizablePanel from '../shared/ui/base/BaseResizablePanel.vue'
@@ -357,16 +356,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #d1d5db;
+  border: none;
   border-radius: 6px;
-  background: white;
+  background: #f3f4f6;
   color: #374151;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .icon-btn:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
+  background: #e5e7eb;
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
 }
 </style>
