@@ -59,3 +59,21 @@ export async function getWindowAtMouse(): Promise<WindowInfoResult> {
 export async function getActiveWindow(): Promise<WindowInfoResult> {
   return await invoke('get_active_window')
 }
+
+export type DeviceCategory = 'keyboard' | 'mouse' | 'touchpad' | 'touchscreen'
+
+export interface InputDevice {
+  name: string
+  handlers: string[]
+  device_type: DeviceCategory
+}
+
+export interface DeviceListResult {
+  success: boolean
+  devices: InputDevice[]
+  error: string | null
+}
+
+export async function getInputDevices(): Promise<DeviceListResult> {
+  return await invoke('get_input_devices')
+}

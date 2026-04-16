@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useConfigStore } from '../../shared/lib/stores/config'
 import { DeviceRule } from '../../shared/lib/types'
 import { BaseInput, BaseSelect, BaseCheckbox, BaseButton } from '../../shared/ui/base'
+import { getInputDevices, type InputDevice } from '../../shared/api/config'
 
-defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: boolean
-}>()
+}>(), {
+  modelValue: false
+})
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
@@ -16,11 +19,63 @@ const store = useConfigStore()
 
 const rules = ref<DeviceRule[]>([])
 const editingIndex = ref<number | null>(null)
+const inputDevices = ref<InputDevice[]>([])
+const loadingDevices = ref(false)
+
+const loadInputDevices = async () => {
+  loadingDevices.value = true
+  try {
+    const result = await getInputDevices()
+    if (result.success) {
+      inputDevices.value = result.devices
+    } else {
+      console.error('Failed to load devices:', result.error)
+    }
+  } catch (e) {
+    console.error('Error loading input devices:', e)
+  } finally {
+    loadingDevices.value = false
+  }
+}
 
 watch(() => store.deviceRules.value, (newRules) => {
   rules.value = JSON.parse(JSON.stringify(newRules))
-  console.log('Loaded device rules:', rules.value)
 }, { deep: true, immediate: true })
+
+watch(() => props.modelValue, (isOpen) => {
+  if (isOpen) {
+    loadInputDevices()
+  }
+})
+
+const devicesByCategory = computed(() => {
+  const groups: Record<string, InputDevice[]> = {
+    keyboard: [],
+    mouse: [],
+    touchpad: [],
+    touchscreen: []
+  }
+  for (const device of inputDevices.value) {
+    if (groups[device.device_type]) {
+      groups[device.device_type].push(device)
+    }
+  }
+  return groups
+})
+
+const categoryIcons: Record<string, string> = {
+  keyboard: '⌨️',
+  mouse: '🖱️',
+  touchpad: '👆',
+  touchscreen: '📱'
+}
+
+const categoryLabels: Record<string, string> = {
+  keyboard: 'Клавиатура',
+  mouse: 'Мышь',
+  touchpad: 'Тачпад',
+  touchscreen: 'Тачскрин'
+}
 
 const close = () => {
   emit('update:modelValue', false)
@@ -39,6 +94,13 @@ const addRule = () => {
     ignore: false
   })
   editingIndex.value = rules.value.length - 1
+  loadInputDevices()
+}
+
+const selectDevice = (rule: DeviceRule, deviceName: string) => {
+  if (!rule.conditions) rule.conditions = []
+  const conditions = rule.conditions as any[]
+  conditions.push(`$name == ${deviceName}`)
 }
 
 const removeRule = (index: number) => {
@@ -259,8 +321,42 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                     <div class="flex items-center justify-between mb-2">
                       <label class="text-sm font-medium text-gray-300">Conditions</label>
                       <BaseButton variant="blue" size="sm" @click="addCondition(rule)">
-                        + добавить условие
+                        + условие
                       </BaseButton>
+                    </div>
+                    
+                    <div v-if="inputDevices.length > 0" class="mb-3">
+                      <div class="text-xs text-gray-400 mb-2">Выберите устройство:</div>
+                      <div class="flex flex-col gap-3">
+                        <div 
+                          v-for="(devices, category) in devicesByCategory" 
+                          :key="category"
+                          v-show="devices.length > 0"
+                        >
+                          <div class="flex items-center gap-2 mb-1 text-xs font-medium" :class="{
+                            'text-green-400': category === 'keyboard',
+                            'text-amber-400': category === 'mouse',
+                            'text-cyan-400': category === 'touchpad',
+                            'text-pink-400': category === 'touchscreen'
+                          }">
+                            <span>{{ categoryIcons[category] }}</span>
+                            <span>{{ categoryLabels[category] }}</span>
+                            <span class="text-gray-500">({{ devices.length }})</span>
+                          </div>
+                          <div class="flex flex-wrap gap-1">
+                            <BaseButton
+                              v-for="device in devices"
+                              :key="device.name"
+                              variant="blue"
+                              size="sm"
+                              :title="device.name"
+                              @click="selectDevice(rule, device.name)"
+                            >
+                              {{ device.name.length > 35 ? device.name.slice(0, 35) + '...' : device.name }}
+                            </BaseButton>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     
                     <div v-if="getConditionsArray(rule).length > 0" class="flex flex-col gap-2">
