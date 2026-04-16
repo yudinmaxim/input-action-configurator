@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { BaseButton } from '../shared/ui/base'
 import { useConfigStore } from '../shared/lib/stores/config'
 import { dumpInputActionsConfig } from '../shared/lib/yaml-converter'
 
@@ -42,12 +41,6 @@ const close = () => {
           </div>
           
           <pre class="flex-1 overflow-auto p-4 text-sm font-mono text-green-400 whitespace-pre">{{ yamlOutput }}</pre>
-          
-          <div class="px-6 py-4 bg-slate-800 flex justify-end">
-            <BaseButton variant="ghost" @click="close">
-              Закрыть
-            </BaseButton>
-          </div>
         </div>
       </div>
     </Transition>
