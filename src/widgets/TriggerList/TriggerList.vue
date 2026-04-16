@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useConfigStore } from '../../shared/lib/stores/config'
-import { BaseButton } from '../../shared/ui/base'
 import NewTriggerForm from './NewTriggerForm.vue'
 import TriggerCard from './TriggerCard.vue'
 
@@ -69,25 +68,4 @@ const selectedTriggerTriggers = computed(() => {
 </template>
 
 <style scoped>
-.icon-btn {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 6px;
-  background: #f3f4f6;
-  color: #374151;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.icon-btn:hover {
-  background: #e5e7eb;
-}
-
-.icon-btn:active {
-  transform: scale(0.95);
-}
 </style>

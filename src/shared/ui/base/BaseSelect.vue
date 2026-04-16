@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 interface IProps {
   modelValue?: string | number | string[]
   options: Array<{ value: string | number; label: string }>
@@ -6,6 +8,7 @@ interface IProps {
   placeholder?: string
   disabled?: boolean
   multiple?: boolean
+  showValueInTitle?: boolean
 }
 
 const {
@@ -14,12 +17,23 @@ const {
   label = '',
   placeholder = '',
   disabled = false,
-  multiple = false
+  multiple = false,
+  showValueInTitle = true
 } = defineProps<IProps>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string | string[]]
 }>()
+
+const selectedLabel = computed(() => {
+  const selected = options.find(o => o.value === modelValue)
+  return selected?.label || ''
+})
+
+const selectTitle = computed(() => {
+  if (!showValueInTitle) return ''
+  return selectedLabel.value || placeholder
+})
 </script>
 
 <template>
@@ -56,6 +70,7 @@ const emit = defineEmits<{
       v-else
       :value="modelValue"
       :disabled="disabled"
+      :title="selectTitle"
       class="px-3 py-2 border border-gray-300 rounded-md text-base text-gray-800 bg-white transition-colors cursor-pointer hover:border-gray-400 focus:border-blue-500 outline-none"
       :class="[disabled && 'bg-gray-50 cursor-not-allowed opacity-50']"
       @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"

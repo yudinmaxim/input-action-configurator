@@ -30,6 +30,8 @@ const selectedTriggerId = computed(() => store.state.selectedTriggerId)
 const selectedTrigger = store.selectedTrigger
 const currentActions = computed(() => selectedTrigger.value?.actions || [])
 const isDirty = computed(() => store.state.isDirty)
+const canUndo = computed(() => store.state.historyIndex > 0)
+const canRedo = computed(() => store.state.historyIndex < store.state.history.length - 1)
 
 // Width for left column
 const triggerListWidth = ref(300)
@@ -218,6 +220,27 @@ const showConfigPreview = ref(false)
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
           </svg>
         </button>
+
+        <button 
+          class="icon-btn ml-4"
+          title="Отменить (Ctrl+Z)"
+          :disabled="!canUndo"
+          @click="store.undo()"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+          </svg>
+        </button>
+        <button 
+          class="icon-btn"
+          title="Вернуть (Ctrl+Y)"
+          :disabled="!canRedo"
+          @click="store.redo()"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"/>
+          </svg>
+        </button>
         
         <button 
           class="icon-btn"
@@ -364,11 +387,17 @@ body {
   transition: all 0.15s ease;
 }
 
-.icon-btn:hover {
+.icon-btn:hover:not(:disabled) {
   background: #e5e7eb;
 }
 
-.icon-btn:active {
+.icon-btn:active:not(:disabled) {
   transform: scale(0.95);
+}
+
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  color: #9ca3af;
 }
 </style>

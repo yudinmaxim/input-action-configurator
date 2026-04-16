@@ -90,12 +90,53 @@ const initialConfig = {
   settings: {}
 }
 
-const state = reactive({
+const state: {
+  config: InputActionsConfig
+  selectedDevice: DeviceType | null
+  selectedTriggerId: string | null
+  isDirty: boolean
+  history: InputActionsConfig[]
+  historyIndex: number
+} = reactive({
   config: JSON.parse(JSON.stringify(initialConfig)) as InputActionsConfig,
   selectedDevice: DeviceType.TOUCHPAD as DeviceType | null,
   selectedTriggerId: null as string | null,
-  isDirty: false
+  isDirty: false,
+  history: [JSON.parse(JSON.stringify(initialConfig))] as InputActionsConfig[],
+  historyIndex: 0
 })
+
+const canUndo = computed(() => state.historyIndex > 0)
+const canRedo = computed(() => state.historyIndex < state.history.length - 1)
+
+const saveToHistory = () => {
+  const snapshot = JSON.parse(JSON.stringify(state.config))
+  if (state.historyIndex < state.history.length - 1) {
+    state.history = state.history.slice(0, state.historyIndex + 1)
+  }
+  state.history.push(snapshot)
+  state.historyIndex = state.history.length - 1
+  if (state.history.length > 50) {
+    state.history.shift()
+    state.historyIndex--
+  }
+}
+
+const undo = () => {
+  if (state.historyIndex > 0) {
+    state.historyIndex--
+    state.config = JSON.parse(JSON.stringify(state.history[state.historyIndex]))
+    state.isDirty = true
+  }
+}
+
+const redo = () => {
+  if (state.historyIndex < state.history.length - 1) {
+    state.historyIndex++
+    state.config = JSON.parse(JSON.stringify(state.history[state.historyIndex]))
+    state.isDirty = true
+  }
+}
 
 export const useConfigStore = () => {
   const devices = computed(() => {
@@ -159,6 +200,7 @@ export const useConfigStore = () => {
     ;(state.config.device![deviceType] as any[]).push(trigger)
     state.selectedTriggerId = trigger.id ?? null
     state.isDirty = true
+    saveToHistory()
   }
   
   const updateTrigger = (deviceType: DeviceType, triggerId: string, updates: any) => {
@@ -169,6 +211,7 @@ export const useConfigStore = () => {
     if (index !== -1) {
       triggers[index] = { ...triggers[index], ...updates }
       state.isDirty = true
+      saveToHistory()
     }
   }
   
@@ -183,6 +226,7 @@ export const useConfigStore = () => {
         state.selectedTriggerId = null
       }
       state.isDirty = true
+      saveToHistory()
     }
   }
   
@@ -190,6 +234,7 @@ export const useConfigStore = () => {
     if (state.config.device?.[deviceType]) {
       state.config.device[deviceType] = []
       state.isDirty = true
+      saveToHistory()
     }
     if (state.selectedDevice === deviceType) {
       state.selectedDevice = null
@@ -206,6 +251,7 @@ export const useConfigStore = () => {
       if (!trigger.actions) trigger.actions = []
       trigger.actions.push(action)
       state.isDirty = true
+      saveToHistory()
     }
   }
   
@@ -217,6 +263,7 @@ export const useConfigStore = () => {
     if (trigger?.actions?.[actionIndex]) {
       trigger.actions[actionIndex] = { ...trigger.actions[actionIndex], ...updates }
       state.isDirty = true
+      saveToHistory()
     }
   }
   
@@ -228,6 +275,7 @@ export const useConfigStore = () => {
     if (trigger?.actions) {
       trigger.actions.splice(actionIndex, 1)
       state.isDirty = true
+      saveToHistory()
     }
   }
   
@@ -236,6 +284,8 @@ export const useConfigStore = () => {
   const loadConfig = (config: InputActionsConfig) => {
     state.config = JSON.parse(JSON.stringify(config))
     state.isDirty = false
+    state.history = [JSON.parse(JSON.stringify(config))]
+    state.historyIndex = 0
   }
   
   const loadFromFile = async (): Promise<ConfigResult> => {
@@ -290,7 +340,11 @@ export const useConfigStore = () => {
     getConfig,
     loadConfig,
     loadFromFile,
-    saveToFile
+    saveToFile,
+    undo,
+    redo,
+    canUndo,
+    canRedo
   }
 }
 
@@ -357,3 +411,4 @@ export const MouseButtonOptions = [
 ]
 
 export { DeviceType, TriggerType, TriggerEvent }
+export { undo, redo, canUndo, canRedo }
