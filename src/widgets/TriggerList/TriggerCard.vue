@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import ConfirmModal from '../ConfirmModal.vue'
+
 const props = defineProps<{
   trigger: any
   selected: boolean
@@ -8,9 +11,17 @@ const emit = defineEmits<{
   (e: 'select'): void
   (e: 'delete'): void
 }>()
+
+const showConfirm = ref(false)
 </script>
 
 <template>
+  <ConfirmModal
+    v-if="showConfirm"
+    :message="`Удалить триггер '${props.trigger.id}'?`"
+    @confirm="emit('delete'); showConfirm = false"
+    @cancel="showConfirm = false"
+  />
   <div
     class="mb-2 px-3 py-2 rounded-md cursor-pointer transition-colors border"
     :class="props.selected ? 'bg-blue-50 border-blue-300' : 'hover:bg-gray-50 border-transparent'"
@@ -26,7 +37,7 @@ const emit = defineEmits<{
           {{ props.trigger.type }}
         </div>
       </div>
-      <button class="delete-btn" @click.stop="emit('delete')">
+      <button class="delete-btn" @click.stop="showConfirm = true">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
