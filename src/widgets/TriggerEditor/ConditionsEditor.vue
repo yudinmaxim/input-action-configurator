@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { BaseInput, BaseSelect } from '../../shared/ui/base'
+import { BaseInput, BaseSelect, BaseButton } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
+import AppSelectorModal from './AppSelectorModal.vue'
 
 interface GroupCondition {
   groupType: 'any' | 'all' | 'none'
@@ -27,6 +28,10 @@ const emit = defineEmits<{
 }>()
 
 const list = ref<ConditionItem[]>([])
+
+const showAppSelector = ref(false)
+const appSelectorIndex = ref<number | null>(null)
+const appSelectorSubIndex = ref<number | null>(null)
 
 // Вычисляем модификаторы из условий
 const keyboardModifiers = computed({
@@ -239,6 +244,26 @@ function getGroup(c: ConditionItem): GroupCondition {
   return c as GroupCondition
 }
 
+const openAppSelector = (index: number, subIndex: number | null = null) => {
+  appSelectorIndex.value = index
+  appSelectorSubIndex.value = subIndex
+  showAppSelector.value = true
+}
+
+const onAppSelected = (className: string) => {
+  if (appSelectorIndex.value !== null) {
+    if (appSelectorSubIndex.value !== null) {
+      onSubVal(appSelectorIndex.value, appSelectorSubIndex.value, className)
+    } else {
+      onVal(appSelectorIndex.value, className)
+    }
+    appSelectorIndex.value = null
+    appSelectorSubIndex.value = null
+  }
+}
+
+const WINDOW_VARIABLES = ['$window_class', '$window_name', '$window_title', '$screen_name']
+
 const helpText = `
 conditions - условия активации
 
@@ -294,6 +319,14 @@ any: [$window_class==firefox, $window_class==chrome]
                   class="flex-1"
                   @update:model-value="(v) => onSubVal(i, subI, v)"
                 />
+                <BaseButton 
+                  v-if="WINDOW_VARIABLES.includes(sub.variable)"
+                  size="sm"
+                  variant="secondary"
+                  @click="openAppSelector(i, subI)"
+                >
+                  📱
+                </BaseButton>
                 <button class="text-red-500 text-sm" @click="removeSub(i, subI)">✕</button>
               </div>
               <button class="text-xs text-blue-500 text-left" @click="addSub(i)">
@@ -325,6 +358,14 @@ any: [$window_class==firefox, $window_class==chrome]
               class="flex-1"
               @update:model-value="(v) => onVal(i, v)"
             />
+            <BaseButton 
+              v-if="WINDOW_VARIABLES.includes(getSimple(c).variable)"
+              size="sm"
+              variant="secondary"
+              @click="openAppSelector(i)"
+            >
+              📱
+            </BaseButton>
           </div>
         </template>
       </div>
@@ -383,5 +424,10 @@ any: [$window_class==firefox, $window_class==chrome]
         </button>
       </div>
     </div>
+    
+    <AppSelectorModal
+      v-model="showAppSelector"
+      @select="onAppSelected"
+    />
   </div>
 </template>
