@@ -250,6 +250,20 @@ const openAppSelector = (index: number, subIndex: number | null = null) => {
   showAppSelector.value = true
 }
 
+const getWindowProperty = (index: number, subIndex: number | null): 'class' | 'name' | 'caption' => {
+  let variable = ''
+  if (subIndex !== null && isGroup(list.value[index])) {
+    variable = list.value[index].conditions[subIndex].variable
+  } else if (isSimple(list.value[index])) {
+    variable = (list.value[index] as SimpleCondition).variable
+  }
+  
+  if (variable === '$window_class') return 'class'
+  if (variable === '$window_name') return 'name'
+  if (variable === '$window_title') return 'caption'
+  return 'class'
+}
+
 const onAppSelected = (className: string) => {
   if (appSelectorIndex.value !== null) {
     if (appSelectorSubIndex.value !== null) {
@@ -427,6 +441,7 @@ any: [$window_class==firefox, $window_class==chrome]
     
     <AppSelectorModal
       v-model="showAppSelector"
+      :window-property="getWindowProperty(appSelectorIndex ?? 0, appSelectorSubIndex)"
       @select="onAppSelected"
     />
   </div>

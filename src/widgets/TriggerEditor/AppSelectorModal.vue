@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { BaseButton } from '../../shared/ui/base'
 import { 
   checkInstalled, 
@@ -8,8 +8,9 @@ import {
   getActiveWindow
 } from '../../entities/window-detector'
 
-defineProps<{
+const props = defineProps<{
   modelValue: boolean
+  windowProperty?: 'class' | 'name' | 'caption'
 }>()
 
 const emit = defineEmits<{
@@ -17,11 +18,27 @@ const emit = defineEmits<{
   'select': [value: string]
 }>()
 
+const propertyLabel = {
+  class: 'класс окна',
+  name: 'имя окна', 
+  caption: 'заголовок окна'
+}
+
+const propertyExamples = {
+  class: 'пример: firefox, chrome, jetbrains-webstorm',
+  name: 'пример: Konsole, Dolphin, Chrome',
+  caption: 'пример: Mozilla Firefox - Home'
+}
+
 const isPicking = ref(false)
 const isInstalling = ref(false)
+const showCountdown = ref(false)
+const countdown = ref(3)
 const statusMessage = ref<string | null>(null)
 const error = ref<string | null>(null)
 const isReady = ref(false)
+
+let countdownInterval: ReturnType<typeof setInterval> | null = null
 
 onMounted(async () => {
   const installed = await checkInstalled()
@@ -32,6 +49,12 @@ onMounted(async () => {
     statusMessage.value = 'FocusNotifier не установлен. Нажмите "Установить" для продолжения.'
   } else if (!running) {
     statusMessage.value = 'Служба FocusNotifier не запущена. Нажмите "Установить" для запуска.'
+  }
+})
+
+onUnmounted(() => {
+  if (countdownInterval) {
+    clearInterval(countdownInterval)
   }
 })
 
@@ -55,35 +78,58 @@ const install = async () => {
   }
 }
 
-const pickFromScreen = async () => {
-  if (!isReady.value) {
-    await install()
-    return
-  }
-  
+const startCountdown = () => {
   isPicking.value = true
+  showCountdown.value = true
+  countdown.value = 3
   error.value = null
-  statusMessage.value = 'Кликните по нужному окну...'
   
-  await new Promise(resolve => setTimeout(resolve, 500))
-  
+  countdownInterval = setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      if (countdownInterval) {
+        clearInterval(countdownInterval)
+        countdownInterval = null
+      }
+      showCountdown.value = false
+      finishPicking()
+    }
+  }, 1000)
+}
+
+const cancelPicking = () => {
+  if (countdownInterval) {
+    clearInterval(countdownInterval)
+    countdownInterval = null
+  }
+  showCountdown.value = false
+  isPicking.value = false
+  countdown.value = 3
+}
+
+const finishPicking = async () => {
   try {
     const window = await getActiveWindow()
+    const property = props.windowProperty || 'class'
     
-    if (window.class) {
-      emit('select', window.class)
+    const value = window[property]
+    
+    if (value) {
+      isPicking.value = false
+      emit('select', value)
       emit('update:modelValue', false)
     } else {
-      error.value = 'Не удалось определить активное окно. Убедитесь, что FocusNotifier работает.'
+      error.value = `Не удалось получить ${propertyLabel[property]}. Попробуйте ещё раз.`
+      isPicking.value = false
     }
   } catch (e) {
     error.value = String(e)
-  } finally {
     isPicking.value = false
   }
 }
 
 const close = () => {
+  cancelPicking()
   emit('update:modelValue', false)
 }
 </script>
@@ -104,7 +150,11 @@ const close = () => {
           
           <div class="px-6 py-6 flex flex-col gap-4">
             <p class="text-sm text-gray-600 text-center">
-              Выберите приложение, для которого будет работать триггер.
+              Выберите {{ propertyLabel[windowProperty || 'class'] }} для условия.
+            </p>
+            
+            <p class="text-xs text-gray-400 text-center">
+              {{ propertyExamples[windowProperty || 'class'] }}
             </p>
             
             <div v-if="statusMessage" class="text-sm text-blue-600 text-center p-2 bg-blue-50 rounded">
@@ -126,12 +176,13 @@ const close = () => {
             </BaseButton>
             
             <BaseButton
+              v-if="isReady"
               variant="primary"
               class="w-full"
               :disabled="isPicking"
-              @click="pickFromScreen"
+              @click="startCountdown"
             >
-              {{ isPicking ? 'Кликните по окну...' : '🖱️ Выбрать активное окно' }}
+              🖱️ Выбрать активное окно
             </BaseButton>
             
             <p class="text-xs text-gray-400 text-center">
@@ -147,6 +198,24 @@ const close = () => {
         </div>
       </div>
     </Transition>
+    
+    <Transition name="fade">
+      <div 
+        v-if="showCountdown"
+        class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/80 cursor-pointer"
+        @click="cancelPicking"
+      >
+        <div class="text-9xl font-bold text-white mb-8">
+          {{ countdown }}
+        </div>
+        <div class="text-xl text-gray-300 mb-4">
+          Переключитесь на нужное окно
+        </div>
+        <div class="text-sm text-gray-500">
+          Кликните в любое место для отмены
+        </div>
+      </div>
+    </Transition>
   </Teleport>
 </template>
 
@@ -158,6 +227,16 @@ const close = () => {
 
 .modal-enter-from,
 .modal-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 </style>
