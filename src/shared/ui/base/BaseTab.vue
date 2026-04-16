@@ -49,12 +49,12 @@ const handleDelete = (event: Event) => {
       <slot name="badge" />
       <button
         v-if="deletable"
-        class="delete-btn inline-flex items-center justify-center w-5 h-5 ml-2 text-gray-400 hover:text-red-500 hover:bg-red-100 rounded transition-colors"
+        class="delete-btn"
         @click="handleDelete"
         title="Delete tab"
       >
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
     </button>
@@ -83,8 +83,27 @@ const handleDelete = (event: Event) => {
 }
 
 .delete-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
   border: none;
+  background: transparent;
+  color: #9ca3af;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
   padding: 0;
+  margin-left: 4px;
+}
+
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.delete-btn:active {
+  background: rgba(239, 68, 68, 0.25);
 }
 </style>

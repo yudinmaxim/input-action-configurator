@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, defineExpose } from 'vue'
+import { ref, onUnmounted } from 'vue'
 
 interface Props {
   initialWidth: number

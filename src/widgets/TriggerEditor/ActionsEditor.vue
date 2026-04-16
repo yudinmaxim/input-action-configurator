@@ -296,7 +296,11 @@ Special (for update/tick):
           <span class="text-sm font-semibold" :class="EVENT_COLORS_TEXT[action.on] || 'text-gray-600'">
             {{ EVENT_LABELS[action.on] || action.on }}
           </span>
-          <button class="text-red-500 hover:text-red-700" @click="remove(actionIndex)">✕</button>
+          <button class="delete-btn" @click="remove(actionIndex)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         </div>
         
         <!-- Тип экшена -->
@@ -369,10 +373,12 @@ Special (for update/tick):
                   />
                 </div>
                 <button 
-                  class="text-red-400 hover:text-red-600 text-xs"
+                  class="delete-btn"
                   @click="removeInputEntry(actionIndex, entryIndex)"
                 >
-                  ✕
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
                 </button>
               </div>
               
@@ -463,14 +469,16 @@ Special (for update/tick):
                     </template>
                     
                     <button 
-                      class="text-red-400 hover:text-red-600 text-xs"
+                      class="delete-btn"
                       @click="() => {
                         const actions = [...(entry.mouse || [])]
                         actions.splice(mi, 1)
                         updateMouseActions(actionIndex, entryIndex, actions)
                       }"
                     >
-                      ✕
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
                     </button>
                   </div>
                   
@@ -563,3 +571,28 @@ Special (for update/tick):
     </div>
   </div>
 </template>
+
+<style scoped>
+.delete-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.delete-btn:active {
+  background: rgba(239, 68, 68, 0.25);
+}
+</style>
