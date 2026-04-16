@@ -5,6 +5,7 @@ import { DeviceList } from '../widgets/DeviceList'
 import { TriggerList } from '../widgets/TriggerList'
 import { TriggerEditor } from '../widgets/TriggerEditor'
 import ConfigPreviewModal from '../widgets/ConfigPreviewModal.vue'
+import DeviceRulesModal from '../widgets/DeviceRulesModal/DeviceRulesModal.vue'
 import { DeviceType } from '../shared/lib/stores/config'
 import BaseDropdown from '../shared/ui/base/BaseDropdown.vue'
 import BaseDropdownItem from '../shared/ui/base/BaseDropdownItem.vue'
@@ -168,6 +169,7 @@ const confirmAddDevice = (deviceType: string | number) => {
 }
 
 const showConfigPreview = ref(false)
+const showDeviceRules = ref(false)
 </script>
 
 <template>
@@ -209,6 +211,16 @@ const showConfigPreview = ref(false)
           </template>
         </BaseDropdown>
         
+        <button 
+          class="icon-btn"
+          title="Device Rules"
+          @click="showDeviceRules = true"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+          </svg>
+        </button>
+
         <button 
           class="icon-btn"
           title="Показать конфиг"
@@ -323,6 +335,10 @@ const showConfigPreview = ref(false)
     
     <ConfigPreviewModal
       v-model="showConfigPreview"
+    />
+    
+    <DeviceRulesModal
+      v-model="showDeviceRules"
     />
   </div>
 </template>

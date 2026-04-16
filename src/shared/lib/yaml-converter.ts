@@ -5,6 +5,26 @@ import { DeviceType, TriggerType, SwipeDirection, CircleDirection, TriggerEvent,
 /**
  * Конвертация из формата файла inputactions во внутренний формат
  */
+function normalizeDeviceRules(rules: any[]): any[] {
+  return rules.map((rule: any) => {
+    const normalized = { ...rule }
+    
+    // Conditions может быть строкой или массивом
+    if (typeof rule.conditions === 'string') {
+      normalized.conditions = [rule.conditions]
+    } else if (Array.isArray(rule.conditions)) {
+      // Каждое условие может быть строкой или объектом
+      normalized.conditions = rule.conditions.map((c: any) => 
+        typeof c === 'string' ? c : c
+      )
+    } else if (!rule.conditions) {
+      normalized.conditions = []
+    }
+    
+    return normalized
+  })
+}
+
 export function parseInputActionsConfig(yamlContent: string): InputActionsConfig {
   const raw = load(yamlContent) as any
   
@@ -14,7 +34,7 @@ export function parseInputActionsConfig(yamlContent: string): InputActionsConfig
 
   const config: InputActionsConfig = {
     device: {},
-    device_rules: raw.device_rules || [],
+    device_rules: normalizeDeviceRules(raw.device_rules || []),
     settings: raw.settings || {}
   }
 

@@ -10,7 +10,8 @@ import {
   MouseButton,
   TRIGGERS_BY_DEVICE,
   TRIGGER_EVENTS,
-  TriggerConfig
+  TriggerConfig,
+  DeviceRule
 } from '../types'
 import { readConfig, writeConfig, type ConfigResult } from '../../api/config'
 import { parseInputActionsConfig, dumpInputActionsConfig } from '../yaml-converter'
@@ -279,6 +280,33 @@ export const useConfigStore = () => {
     }
   }
   
+  const deviceRules = computed(() => state.config.device_rules || [])
+  
+  const addDeviceRule = (rule: DeviceRule) => {
+    if (!state.config.device_rules) {
+      state.config.device_rules = []
+    }
+    state.config.device_rules.push(rule)
+    state.isDirty = true
+    saveToHistory()
+  }
+  
+  const updateDeviceRule = (index: number, updates: Partial<DeviceRule>) => {
+    if (state.config.device_rules && state.config.device_rules[index]) {
+      state.config.device_rules[index] = { ...state.config.device_rules[index], ...updates }
+      state.isDirty = true
+      saveToHistory()
+    }
+  }
+  
+  const deleteDeviceRule = (index: number) => {
+    if (state.config.device_rules) {
+      state.config.device_rules.splice(index, 1)
+      state.isDirty = true
+      saveToHistory()
+    }
+  }
+  
   const getConfig = () => JSON.parse(JSON.stringify(state.config))
   
   const loadConfig = (config: InputActionsConfig) => {
@@ -337,6 +365,10 @@ export const useConfigStore = () => {
     addAction,
     updateAction,
     deleteAction,
+    deviceRules,
+    addDeviceRule,
+    updateDeviceRule,
+    deleteDeviceRule,
     getConfig,
     loadConfig,
     loadFromFile,

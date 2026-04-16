@@ -2,6 +2,10 @@
 
 Используй русский язык как приоритетный
 
+## wiki for input actions
+
+https://wiki.inputactions.org/v0.9.0/example-triggers.html
+
 ## Commands
 
 ```bash
