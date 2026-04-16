@@ -264,6 +264,26 @@ const getWindowProperty = (index: number, subIndex: number | null): 'class' | 'n
   return 'class'
 }
 
+const getConditionTitle = (type: string): string => {
+  const titles: Record<string, string> = {
+    condition: 'Простое условие',
+    any: 'Любое из списка (OR)',
+    all: 'Все из списка (AND)',
+    none: 'Ни одно из списка (NOT)'
+  }
+  return titles[type] || type
+}
+
+const getConditionDescription = (type: string): string => {
+  const descriptions: Record<string, string> = {
+    condition: 'Проверяет $переменная == значение',
+    any: 'Активируется, если хотя бы одно условие выполняется',
+    all: 'Активируется только если все условия выполняются',
+    none: 'Активируется если ни одно условие НЕ выполняется'
+  }
+  return descriptions[type] || ''
+}
+
 const onAppSelected = (className: string) => {
   if (appSelectorIndex.value !== null) {
     if (appSelectorSubIndex.value !== null) {
@@ -308,12 +328,18 @@ any: [$window_class==firefox, $window_class==chrome]
           :class="TYPE_COLORS[getRootType(c)]"
         >
           <div class="flex items-center justify-between">
-            <span class="text-xs font-medium" :class="{
-              'text-blue-600': getRootType(c) === 'condition',
-              'text-green-600': getRootType(c) === 'any',
-              'text-amber-600': getRootType(c) === 'all',
-              'text-red-600': getRootType(c) === 'none',
-            }">{{ TYPE_LABELS[getRootType(c)] }}</span>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-medium" :class="{
+                'text-blue-600': getRootType(c) === 'condition',
+                'text-green-600': getRootType(c) === 'any',
+                'text-amber-600': getRootType(c) === 'all',
+                'text-red-600': getRootType(c) === 'none',
+              }">{{ TYPE_LABELS[getRootType(c)] }}</span>
+              <FieldHelp>
+                <template #title>{{ getConditionTitle(getRootType(c)) }}</template>
+                {{ getConditionDescription(getRootType(c)) }}
+              </FieldHelp>
+            </div>
             <button class="delete-btn" @click="remove(i)">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
