@@ -26,7 +26,7 @@ const variantClass: Record<string, string> = {
   green: 'bg-green-100 text-green-600 hover:bg-green-200 active:scale-95 border-none',
   amber: 'bg-amber-100 text-amber-600 hover:bg-amber-200 active:scale-95 border-none',
   red: 'bg-red-100 text-red-600 hover:bg-red-200 active:scale-95 border-none',
-  icon: 'bg-transparent text-gray-500 hover:bg-red-100 hover:text-red-500 active:scale-90 w-6 h-6 rounded-full justify-center border-none'
+  icon: 'bg-transparent text-gray-400 hover:bg-red-100 hover:text-red-500 active:scale-90 w-8 h-8 rounded-full justify-center border-none p-0'
 }
 
 const sizeClass = {
@@ -46,3 +46,13 @@ const sizeClass = {
     <slot />
   </button>
 </template>
+
+<style scoped>
+button :deep(svg) {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+</style>
