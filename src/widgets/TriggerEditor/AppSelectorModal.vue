@@ -145,7 +145,6 @@ const close = () => {
         <div class="bg-white rounded-lg shadow-xl w-[400px] overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h3 class="text-lg font-semibold text-gray-800">Выбрать приложение</h3>
-            <button class="text-gray-400 hover:text-gray-600" @click="close">✕</button>
           </div>
           
           <div class="px-6 py-6 flex flex-col gap-4">

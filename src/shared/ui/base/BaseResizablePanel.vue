@@ -117,7 +117,6 @@ defineExpose({ isResizing })
   user-select: none;
   -webkit-user-select: none;
   position: relative;
-  z-index: 100;
   flex-shrink: 0;
 }
 

@@ -4,12 +4,12 @@ import { useConfigStore } from '../shared/lib/stores/config'
 import { DeviceList } from '../widgets/DeviceList'
 import { TriggerList } from '../widgets/TriggerList'
 import { TriggerEditor } from '../widgets/TriggerEditor'
-import YamlPreview from '../widgets/YamlPreview/YamlPreview.vue'
+import ConfigPreviewModal from '../widgets/ConfigPreviewModal.vue'
 import { DeviceType } from '../shared/lib/stores/config'
 import BaseButton from '../shared/ui/base/BaseButton.vue'
 import BaseDropdown from '../shared/ui/base/BaseDropdown.vue'
 import BaseDropdownItem from '../shared/ui/base/BaseDropdownItem.vue'
-import BaseThreeColumnPanel from '../shared/ui/base/BaseThreeColumnPanel.vue'
+import BaseResizablePanel from '../shared/ui/base/BaseResizablePanel.vue'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 
 const store = useConfigStore()
@@ -36,7 +36,6 @@ const isDirty = computed(() => store.state.isDirty)
 const triggerListWidth = ref(300)
 
 // Add device dropdown state
-const selectedDeviceType = ref<DeviceType | ''>('')
 
 const deviceTypeOptions = [
   { value: DeviceType.KEYBOARD, label: 'Keyboard', icon: '⌨️' },
@@ -159,7 +158,7 @@ const confirmAddDevice = (deviceType: string | number) => {
   if (!store.state.config.device) {
     store.state.config.device = {} as any
   }
-  store.state.config.device[type] = []
+  store.state.config.device![type] = []
   store.state.isDirty = true
   console.log('Device config after add:', store.state.config.device)
   
@@ -167,6 +166,8 @@ const confirmAddDevice = (deviceType: string | number) => {
   store.setSelectedDevice(type)
   console.log('Selected device:', store.state.selectedDevice)
 }
+
+const showConfigPreview = ref(false)
 </script>
 
 <template>
@@ -206,6 +207,10 @@ const confirmAddDevice = (deviceType: string | number) => {
         <BaseButton variant="primary" size="sm" @click="handleSave">
           Save
         </BaseButton>
+        
+        <BaseButton variant="secondary" size="sm" @click="showConfigPreview = true">
+          📄 Config
+        </BaseButton>
         <div class="flex border-l border-gray-300 pl-2 ml-2 window-controls">
           <button 
             class="control-btn minimize"
@@ -244,14 +249,14 @@ const confirmAddDevice = (deviceType: string | number) => {
       @select-device="handleSelectDevice"
     />
     
-    <!-- Three column layout with resizable panels -->
-    <BaseThreeColumnPanel
-      :col1-width="triggerListWidth"
-      :col1-min="200"
-      :col1-max="500"
-      @update:col1-width="triggerListWidth = $event"
+    <!-- Two column layout with resizable left panel -->
+    <BaseResizablePanel
+      :initial-width="triggerListWidth"
+      :min-width="200"
+      :max-width="500"
+      @update:width="triggerListWidth = $event"
     >
-      <template #col1>
+      <template #default>
         <TriggerList
           :selected-device="selectedDevice"
           :selected-trigger-id="selectedTriggerId"
@@ -261,7 +266,7 @@ const confirmAddDevice = (deviceType: string | number) => {
         />
       </template>
       
-      <template #col2>
+      <template #right>
         <TriggerEditor
           :selected-device="selectedDevice"
           :selected-trigger-id="selectedTriggerId"
@@ -274,11 +279,11 @@ const confirmAddDevice = (deviceType: string | number) => {
           @delete-trigger="handleDeleteCurrentTrigger"
         />
       </template>
-      
-      <template #col3>
-        <YamlPreview />
-      </template>
-    </BaseThreeColumnPanel>
+    </BaseResizablePanel>
+    
+    <ConfigPreviewModal
+      v-model="showConfigPreview"
+    />
   </div>
 </template>
 
