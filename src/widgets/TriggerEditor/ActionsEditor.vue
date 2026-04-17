@@ -36,6 +36,7 @@ const emit = defineEmits<{
 }>()
 
 const list = ref<ActionItem[]>([])
+const mouseModeMap = ref<Record<string, string>>({})
 
 const EVENT_COLORS: Record<string, string> = {
   'begin': 'bg-blue-50 border-blue-200',
@@ -82,6 +83,37 @@ function syncList() {
 }
 
 watch(() => props.actions, syncList, { immediate: true, deep: true })
+
+// Сброс состояния режима мыши при изменении структуры списка действий
+// Временно отключен для отладки
+// watch(() => {
+//   // Создаем ключ, который меняется только при изменении структуры (количество действий и entries)
+//   return list.value.map(action => ({
+//     inputLength: action.input?.length || 0
+//   }))
+// }, () => {
+//   console.log('list structure changed, resetting mouseModeMap')
+//   mouseModeMap.value = {}
+// }, { deep: true })
+
+function getMouseMode(actionIndex: number, entryIndex: number): string {
+  const key = `${actionIndex}-${entryIndex}`
+  if (mouseModeMap.value[key]) {
+    console.log('getMouseMode cached', { actionIndex, entryIndex, key, mode: mouseModeMap.value[key] })
+    return mouseModeMap.value[key]
+  }
+  const entry = list.value[actionIndex]?.input?.[entryIndex]
+  if (!entry) return 'click'
+  const computed = getMouseActionMode(entry)
+  console.log('getMouseMode computed', { actionIndex, entryIndex, key, computed })
+  return computed
+}
+
+function setMouseMode(actionIndex: number, entryIndex: number, mode: string) {
+  const key = `${actionIndex}-${entryIndex}`
+  console.log('setMouseMode', { actionIndex, entryIndex, key, mode })
+  mouseModeMap.value[key] = mode
+}
 
 function getActionType(action: ActionItem): 'command' | 'input' | 'shortcut' | 'sleep' | 'empty' {
   if (action.command !== undefined) return 'command'
@@ -245,6 +277,7 @@ function isMouseClick(entry: any): boolean {
 function isMouseSimple(entry: any): boolean {
   const actions = entry.mouse || []
   if (actions.length === 0) return true
+  if (actions.length > 1) return false
   
   const firstAction = String(actions[0])
   if (firstAction.startsWith('+') || firstAction.startsWith('-')) {
@@ -270,6 +303,9 @@ function getMouseActionMode(entry: any): string {
   
   const firstAction = String(actions[0])
   
+  // Если единственное действие является сложной командой
+  if (isMouseActionCommand(firstAction)) return 'custom'
+  
   if (firstAction.startsWith('+')) return 'down'
   if (firstAction.startsWith('-')) return 'up'
   
@@ -290,11 +326,17 @@ function getMouseActionOptions(entry: any): Array<{value: string, label: string}
 }
 
 function setMouseActionMode(actionIndex: number, entryIndex: number, mode: string) {
+  console.log('setMouseActionMode called', { actionIndex, entryIndex, mode })
+  // Сохраняем выбранный режим
+  setMouseMode(actionIndex, entryIndex, mode)
+  
   const action = list.value[actionIndex]
   const entry = action.input?.[entryIndex]
   const currentActions = [...(entry?.mouse || [])]
   
   if (mode === 'custom') {
+    console.log('custom mode, keeping actions', currentActions)
+    // Оставляем текущие действия без изменений
     updateMouseActions(actionIndex, entryIndex, currentActions)
     return
   }
@@ -313,6 +355,7 @@ function setMouseActionMode(actionIndex: number, entryIndex: number, mode: strin
       break
   }
   
+  console.log('switching to simple mode, newActions', newActions)
   updateMouseActions(actionIndex, entryIndex, newActions)
 }
 
@@ -491,7 +534,7 @@ Special (for update/tick):
                   <template v-if="getInputType(entry) === 'mouse'">
                     <span class="text-gray-400">→</span>
                     <BaseSelect
-                      :model-value="getMouseActionMode(entry)"
+                      :model-value="getMouseMode(actionIndex, entryIndex)"
                       :options="getMouseActionOptions(entry)"
                       class="w-28"
                       @update:model-value="(mode) => setMouseActionMode(actionIndex, entryIndex, String(mode))"
@@ -536,12 +579,12 @@ Special (for update/tick):
               <template v-if="getInputType(entry) === 'mouse'">
                 <div class="flex flex-col gap-1">
                   <!-- Click/Down/Up mode -->
-                  <div v-if="isMouseSimple(entry)" class="mt-2">
+                  <div v-if="getMouseMode(actionIndex, entryIndex) !== 'custom'" class="mt-2">
                     <label class="text-xs text-gray-500 mb-2 block">Buttons</label>
                     <MouseButtonsSelector
                       :model-value="getMouseButtonsForSelector(entry)"
                       @update:model-value="(buttons) => {
-                        const mode = getMouseActionMode(entry)
+                        const mode = getMouseMode(actionIndex, entryIndex)
                         const prefix = mode === 'down' ? '+' : mode === 'up' ? '-' : ''
                         const actions = (buttons as string[]).map(b => prefix + b)
                         updateMouseActions(actionIndex, entryIndex, actions)
