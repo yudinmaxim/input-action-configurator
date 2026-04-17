@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { BaseInput, BaseSelect } from '../../shared/ui/base'
+import { BaseInput, BaseSelect, BaseButton } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
 import { getActiveWindow } from '../../entities/window-detector'
@@ -161,7 +161,8 @@ function parseSub(raw: any[]): { variable: string, value: string }[] {
 function serialize(): any[] {
   return list.value.map(c => {
     if (isGroup(c)) {
-      const subs = c.conditions.filter(x => x.variable && x.value).map(x => `${x.variable} == ${x.value}`)
+      // Сохраняем все условия, даже пустые
+      const subs = c.conditions.map(x => x.variable ? `${x.variable} == ${x.value}` : x.value)
       if (c.groupType === 'any') return { any: subs }
       if (c.groupType === 'all') return { all: subs }
       if (c.groupType === 'none') return { none: subs }
@@ -182,12 +183,12 @@ onMounted(() => {
 })
 
 const doAddSimple = () => {
-  list.value.push({ variable: '', value: '' })
+  list.value.push({ variable: '$window_class', value: '' })
   saveConditions()
 }
 
 const doAddGroup = (type: 'any' | 'all' | 'none') => {
-  list.value.push({ groupType: type, conditions: [{ variable: '', value: '' }] })
+  list.value.push({ groupType: type, conditions: [{ variable: '$window_class', value: '' }] })
   saveConditions()
 }
 
@@ -228,7 +229,8 @@ const onSubVal = (i: number, subI: number, v: string) => {
 
 const addSub = (i: number) => {
   if (isGroup(list.value[i])) {
-    list.value[i].conditions.push({ variable: '', value: '' })
+    const newCondition = { variable: '$window_class', value: '' }
+    list.value[i].conditions.push(newCondition)
     saveConditions()
   }
 }
@@ -318,15 +320,27 @@ const cancelCountdown = () => {
 }
 
 const finishPicking = async () => {
-  const window = await getActiveWindow()
-  const property = getWindowProperty(appSelectorIndex.value ?? 0, appSelectorSubIndex.value)
-  const value = window[property as keyof typeof window]
+  console.log('finishPicking started', { index: appSelectorIndex.value, subIndex: appSelectorSubIndex.value })
+  const windowInfo = await getActiveWindow()
+  console.log('windowInfo received', windowInfo)
+  
+  if (!appSelectorIndex.value && appSelectorIndex.value !== 0) {
+    console.log('No index selected')
+    appSelectorIndex.value = null
+    appSelectorSubIndex.value = null
+    return
+  }
+  
+  const property = getWindowProperty(appSelectorIndex.value, appSelectorSubIndex.value)
+  console.log('property to get:', property)
+  const value = windowInfo[property as keyof typeof windowInfo]
+  console.log('value:', value)
   
   if (value) {
     if (appSelectorSubIndex.value !== null) {
-      onSubVal(appSelectorIndex.value!, appSelectorSubIndex.value, value)
+      onSubVal(appSelectorIndex.value, appSelectorSubIndex.value, value)
     } else {
-      onVal(appSelectorIndex.value!, value)
+      onVal(appSelectorIndex.value, value)
     }
   }
   
@@ -418,9 +432,14 @@ any: [$window_class==firefox, $window_class==chrome]
                   </svg>
                 </button>
               </div>
-              <button class="text-xs text-blue-500 text-left" @click="addSub(i)">
-                + добавить условие
-              </button>
+              <BaseButton variant="ghost" size="sm" @click="addSub(i)">
+                <template #icon-left>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                  </svg>
+                </template>
+                добавить условие
+              </BaseButton>
             </div>
           </template>
           
@@ -468,57 +487,73 @@ any: [$window_class==firefox, $window_class==chrome]
       </div>
       
       <div class="flex flex-wrap gap-2">
-        <button 
-          class="add-btn add-btn-blue"
-          @click="doAddSimple"
-        >
-          + condition
-          <span @click.stop>
-            <FieldHelp class="text-sm ml-1">
-              <template #title>Простое условие</template>
-              Проверяет $переменная == значение
-            </FieldHelp>
-          </span>
-        </button>
+        <BaseButton variant="blue" @click="doAddSimple">
+          <template #icon-left>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </template>
+          condition
+          <template #icon-right>
+            <span @click.stop>
+              <FieldHelp>
+                <template #title>Простое условие</template>
+                Проверяет $переменная == значение
+              </FieldHelp>
+            </span>
+          </template>
+        </BaseButton>
         
-        <button 
-          class="add-btn add-btn-green"
-          @click="doAddGroup('any')"
-        >
-          + any
-          <span @click.stop>
-            <FieldHelp class="text-sm ml-1">
-              <template #title>Любое из списка</template>
-              Активируется, если хотя бы одно выполняется
-            </FieldHelp>
-          </span>
-        </button>
+        <BaseButton variant="green" @click="doAddGroup('any')">
+          <template #icon-left>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </template>
+          any
+          <template #icon-right>
+            <span @click.stop>
+              <FieldHelp>
+                <template #title>Любое из списка</template>
+                Активируется, если хотя бы одно выполняется
+              </FieldHelp>
+            </span>
+          </template>
+        </BaseButton>
         
-        <button 
-          class="add-btn add-btn-amber"
-          @click="doAddGroup('all')"
-        >
-          + all
-          <span @click.stop>
-            <FieldHelp class="text-sm ml-1">
-              <template #title>Все из списка</template>
-              Активируется только если все выполняются
-            </FieldHelp>
-          </span>
-        </button>
+        <BaseButton variant="amber" @click="doAddGroup('all')">
+          <template #icon-left>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </template>
+          all
+          <template #icon-right>
+            <span @click.stop>
+              <FieldHelp>
+                <template #title>Все из списка</template>
+                Активируется только если все выполняются
+              </FieldHelp>
+            </span>
+          </template>
+        </BaseButton>
         
-        <button 
-          class="add-btn add-btn-red"
-          @click="doAddGroup('none')"
-        >
-          + none
-          <span @click.stop>
-            <FieldHelp class="text-sm ml-1">
-              <template #title>Ни одно из списка</template>
-              Активируется если ни одно не выполняется
-            </FieldHelp>
-          </span>
-        </button>
+        <BaseButton variant="red" @click="doAddGroup('none')">
+          <template #icon-left>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </template>
+          none
+          <template #icon-right>
+            <span @click.stop>
+              <FieldHelp>
+                <template #title>Ни одно из списка</template>
+                Активируется если ни одно не выполняется
+              </FieldHelp>
+            </span>
+          </template>
+        </BaseButton>
       </div>
     </div>
     

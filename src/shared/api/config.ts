@@ -12,12 +12,6 @@ export interface WindowInfo {
   pid: number | null
 }
 
-export interface WindowListResult {
-  success: boolean
-  windows: WindowInfo[]
-  error: string | null
-}
-
 export interface WindowInfoResult {
   success: boolean
   window: WindowInfo | null
@@ -36,10 +30,6 @@ export async function writeConfig(content: string): Promise<ConfigResult> {
   return await invoke('write_config', { content })
 }
 
-export async function getWindowList(): Promise<WindowListResult> {
-  return await invoke('get_window_list')
-}
-
 export async function startClickListener(): Promise<boolean> {
   return await invoke('start_click_listener')
 }
@@ -50,10 +40,6 @@ export async function stopClickListener(): Promise<boolean> {
 
 export async function isListeningForClick(): Promise<boolean> {
   return await invoke('is_listening_for_click')
-}
-
-export async function getWindowAtMouse(): Promise<WindowInfoResult> {
-  return await invoke('get_window_at_mouse')
 }
 
 export async function getActiveWindow(): Promise<WindowInfoResult> {

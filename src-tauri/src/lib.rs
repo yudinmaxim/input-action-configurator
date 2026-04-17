@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
@@ -24,13 +23,6 @@ pub struct WindowInfo {
     pub title: String,
     pub class_name: String,
     pub pid: Option<u32>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct WindowListResult {
-    pub success: bool,
-    pub windows: Vec<WindowInfo>,
-    pub error: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -123,149 +115,6 @@ fn write_config(content: String) -> ConfigResult {
             success: false,
             content: None,
             error: Some(format!("Failed to write config: {}", e)),
-        },
-    }
-}
-
-#[tauri::command]
-fn get_window_list() -> WindowListResult {
-    // Try wmctrl first - works on both X11 and Wayland with KWin
-    let output = Command::new("wmctrl").args(["-l", "-x"]).output();
-
-    match output {
-        Ok(out) if out.status.success() => {
-            let stdout = String::from_utf8_lossy(&out.stdout);
-            let mut windows: Vec<WindowInfo> = Vec::new();
-            let mut seen_classes: HashSet<String> = HashSet::new();
-
-            for line in stdout.lines() {
-                // wmctrl -l -x format: "window_id  desktop  hostname.class  hostname  title"
-                // Example: "0x02200004  0  yandex-browser.Yandex-browser  maxim-hp-pc.lan EMS Portal..."
-
-                let parts: Vec<&str> = line.split_whitespace().collect::<Vec<_>>();
-                // parts[0] = window_id, parts[1] = desktop, parts[2] = hostname.class, parts[3] = hostname, parts[4..] = title
-                if parts.len() >= 5 {
-                    let hostname_class = parts[2];
-                    let title = parts[4..].join(" ");
-
-                    // Parse class - format is "Class.Instance" or just "Class"
-                    // We take the first part before any dot
-                    let class_name = hostname_class
-                        .split('.')
-                        .next()
-                        .unwrap_or(hostname_class)
-                        .to_lowercase();
-
-                    // Skip unnamed windows and desktop items
-                    if !class_name.is_empty()
-                        && !title.is_empty()
-                        && !seen_classes.contains(&class_name)
-                    {
-                        seen_classes.insert(class_name.clone());
-                        windows.push(WindowInfo {
-                            title,
-                            class_name,
-                            pid: None,
-                        });
-                    }
-                }
-            }
-
-            windows.sort_by(|a, b| a.class_name.cmp(&b.class_name));
-
-            if windows.is_empty() {
-                let xdotool_result = get_window_list_xdotool();
-                if xdotool_result.windows.is_empty() {
-                    return WindowListResult {
-                        success: true,
-                        windows: vec![],
-                        error: Some("Wayland detected: нативные приложения не видны. Введите window class вручную.".to_string()),
-                    };
-                }
-                return xdotool_result;
-            }
-
-            WindowListResult {
-                success: true,
-                windows,
-                error: None,
-            }
-        }
-        Ok(_) | Err(_) => {
-            let xdotool_result = get_window_list_xdotool();
-            if xdotool_result.windows.is_empty() {
-                return WindowListResult {
-                    success: true,
-                    windows: vec![],
-                    error: Some(
-                        "Не удалось получить список окон. Введите window class вручную."
-                            .to_string(),
-                    ),
-                };
-            }
-            xdotool_result
-        }
-    }
-}
-
-fn get_window_list_xdotool() -> WindowListResult {
-    let output = Command::new("xdotool")
-        .args(["search", "--onlyvisible", "--class", "."])
-        .output();
-
-    match output {
-        Ok(out) if out.status.success() => {
-            let window_ids: Vec<String> = String::from_utf8_lossy(&out.stdout)
-                .lines()
-                .map(|s| s.trim().to_string())
-                .filter(|s| !s.is_empty())
-                .collect();
-
-            let mut windows: Vec<WindowInfo> = Vec::new();
-            let mut seen_classes: HashSet<String> = HashSet::new();
-
-            for window_id in window_ids {
-                let class_output = Command::new("xdotool")
-                    .args(["getwindowclassname", &window_id])
-                    .output();
-
-                let name_output = Command::new("xdotool")
-                    .args(["getwindowname", &window_id])
-                    .output();
-
-                let class_name = class_output
-                    .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_lowercase())
-                    .unwrap_or_default();
-
-                let title = name_output
-                    .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string())
-                    .unwrap_or_default();
-
-                if !class_name.is_empty()
-                    && !title.is_empty()
-                    && !seen_classes.contains(&class_name)
-                {
-                    seen_classes.insert(class_name.clone());
-                    windows.push(WindowInfo {
-                        title,
-                        class_name,
-                        pid: None,
-                    });
-                }
-            }
-
-            windows.sort_by(|a, b| a.class_name.cmp(&b.class_name));
-
-            WindowListResult {
-                success: true,
-                windows,
-                error: None,
-            }
-        }
-        Ok(_) | Err(_) => WindowListResult {
-            success: false,
-            windows: vec![],
-            error: Some("Failed to get window list. Install wmctrl.".to_string()),
         },
     }
 }
@@ -816,7 +665,6 @@ pub fn run() {
             get_config_path,
             read_config,
             write_config,
-            get_window_list,
             start_click_listener,
             stop_click_listener,
             is_listening_for_click,

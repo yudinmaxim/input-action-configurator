@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BaseButton from './BaseButton.vue'
+
 interface IProps {
   modelValue: boolean
   title?: string
@@ -53,12 +55,12 @@ const handleConfirm = () => {
             <p class="text-gray-600">{{ message }}</p>
           </div>
           <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3">
-            <button class="modal-btn modal-btn-cancel" @click="handleClose">
+            <BaseButton variant="secondary" @click="handleClose">
               {{ cancelText }}
-            </button>
-            <button class="modal-btn modal-btn-danger" @click="handleConfirm">
+            </BaseButton>
+            <BaseButton :variant="confirmVariant" @click="handleConfirm">
               {{ confirmText }}
-            </button>
+            </BaseButton>
           </div>
         </div>
       </div>
@@ -108,40 +110,5 @@ const handleConfirm = () => {
 
 .modal-close-btn:active {
   transform: scale(0.9);
-}
-
-.modal-btn {
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: 1px solid;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.modal-btn:active {
-  transform: scale(0.97);
-}
-
-.modal-btn-cancel {
-  background: #f3f4f6;
-  border-color: #d1d5db;
-  color: #374151;
-}
-
-.modal-btn-cancel:hover {
-  background: #e5e7eb;
-  border-color: #9ca3af;
-}
-
-.modal-btn-danger {
-  background: #fef2f2;
-  border-color: #fecaca;
-  color: #dc2626;
-}
-
-.modal-btn-danger:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
 }
 </style>

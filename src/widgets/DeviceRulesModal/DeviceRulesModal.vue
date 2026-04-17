@@ -262,11 +262,11 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                 {{ rules.length }} правил
               </span>
             </div>
-            <BaseButton variant="icon" @click="close">
+            <button class="delete-btn" @click="close">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
-            </BaseButton>
+            </button>
           </div>
           
           <div class="flex-1 overflow-auto p-4">
@@ -321,8 +321,13 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                     <div class="flex items-center justify-between mb-2">
                       <label class="text-sm font-medium text-gray-300">Conditions</label>
                       <BaseButton variant="blue" size="sm" @click="addCondition(rule)">
-                        + условие
-                      </BaseButton>
+                          <template #icon-left>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                          </template>
+                          условие
+                        </BaseButton>
                     </div>
                     
                     <div v-if="inputDevices.length > 0" class="mb-3">

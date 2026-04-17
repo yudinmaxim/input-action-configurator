@@ -47,7 +47,7 @@ KWin скрипт для определения активного окна на
 ```
 src/entities/window-detector/
 ├── index.ts                    # FSD API (exports from entities)
-├── contents/code/main.js        # KWin скрипт
+├── contents/code/main.js       # KWin скрипт
 ├── helpers/bashscripts/
 │   ├── FocusNotifierListener.sh  # DBus listener
 │   └── activewindow             # CLI утилита
@@ -61,35 +61,16 @@ src/entities/window-detector/
 - `window_detector_install()` - установить (symlink + DBus + запуск)
 - `window_detector_uninstall()` - удалить
 - `window_detector_get_active()` - получить данные окна
+- `get_input_devices()` - получить список устройств ввода
 
-### Установка вручную
-```bash
-# 1. KWin скрипт
-mkdir -p ~/.local/share/kwin/scripts
-ln -sf ~/Projects/.../src/entities/window-detector ~/.local/share/kwin/scripts/FocusNotifier
+### Установка (подробнее в README.md)
 
-# 2. Listener
-cp helpers/bashscripts/FocusNotifierListener.sh ~/.local/bin/
-chmod +x ~/.local/bin/FocusNotifierListener.sh
-
-# 3. DBus service
-mkdir -p ~/.local/share/dbus-1/services
-cat > ~/.local/share/dbus-1/services/scot.massie.FocusNotifier.service << 'EOF'
-[D-BUS Service]
-Name=scot.massie.FocusNotifier
-Exec=/home/maxim/.local/bin/FocusNotifierListener.sh
-EOF
-
-# 4. Запуск
-~/.local/bin/FocusNotifierListener.sh &
-
-# 5. Включить в System Settings → Window Management → KWin Scripts
-```
+См. секцию "Установка KWin скрипта FocusNotifier" в README.md.
 
 ### Данные активного окна
 Хранятся в `/tmp/FocusNotifier/`:
 - `pid.txt` - Process ID
-- `pname.txt` - Process name
+- `pname.txt` - Process name  
 - `wclass.txt` - Window class (используется для условий)
 - `wname.txt` - Window name
 - `wcaption.txt` - Window title
