@@ -3,6 +3,7 @@ use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::Manager;
 
 const DETECTOR_SOURCE: &str = "src/entities/window-detector";
@@ -115,6 +116,182 @@ fn write_config(content: String) -> ConfigResult {
             success: false,
             content: None,
             error: Some(format!("Failed to write config: {}", e)),
+        },
+    }
+}
+
+#[tauri::command]
+fn get_gui_config_path() -> String {
+    let config_dir = dirs::config_dir()
+        .unwrap_or_else(|| PathBuf::from("."))
+        .join("inputactions");
+
+    config_dir
+        .join("gui.json")
+        .to_string_lossy()
+        .to_string()
+}
+
+#[tauri::command]
+fn read_gui_config() -> ConfigResult {
+    let config_path = get_gui_config_path();
+    let path = PathBuf::from(&config_path);
+
+    // Ensure directory exists
+    if let Some(parent) = path.parent() {
+        if !parent.exists() {
+            if let Err(e) = fs::create_dir_all(parent) {
+                return ConfigResult {
+                    success: false,
+                    content: None,
+                    error: Some(format!("Failed to create GUI config directory: {}", e)),
+                };
+            }
+        }
+    }
+
+    // Read file if exists
+    if path.exists() {
+        match fs::read_to_string(&path) {
+            Ok(content) => ConfigResult {
+                success: true,
+                content: Some(content),
+                error: None,
+            },
+            Err(e) => ConfigResult {
+                success: false,
+                content: None,
+                error: Some(format!("Failed to read GUI config: {}", e)),
+            },
+        }
+    } else {
+        // Return empty JSON object
+        ConfigResult {
+            success: true,
+            content: Some("{}".to_string()),
+            error: None,
+        }
+    }
+}
+
+#[tauri::command]
+fn write_gui_config(content: String) -> ConfigResult {
+    let config_path = get_gui_config_path();
+    let path = PathBuf::from(&config_path);
+
+    // Ensure directory exists
+    if let Some(parent) = path.parent() {
+        if !parent.exists() {
+            if let Err(e) = fs::create_dir_all(parent) {
+                return ConfigResult {
+                    success: false,
+                    content: None,
+                    error: Some(format!("Failed to create GUI config directory: {}", e)),
+                };
+            }
+        }
+    }
+
+    // Write file
+    match fs::write(&path, &content) {
+        Ok(_) => ConfigResult {
+            success: true,
+            content: Some(config_path),
+            error: None,
+        },
+        Err(e) => ConfigResult {
+            success: false,
+            content: None,
+            error: Some(format!("Failed to write GUI config: {}", e)),
+        },
+    }
+}
+
+#[tauri::command]
+fn create_config_backup(config_path: String, backup_count: u32) -> ConfigResult {
+    let path = PathBuf::from(&config_path);
+    if !path.exists() {
+        return ConfigResult {
+            success: false,
+            content: None,
+            error: Some("Config file does not exist".to_string()),
+        };
+    }
+
+    let parent_dir = match path.parent() {
+        Some(dir) => dir,
+        None => {
+            return ConfigResult {
+                success: false,
+                content: None,
+                error: Some("Cannot determine parent directory".to_string()),
+            }
+        }
+    };
+
+    let file_name = match path.file_stem() {
+        Some(name) => name.to_string_lossy().to_string(),
+        None => {
+            return ConfigResult {
+                success: false,
+                content: None,
+                error: Some("Invalid file name".to_string()),
+            }
+        }
+    };
+    let extension = path.extension().map(|ext| ext.to_string_lossy().to_string()).unwrap_or_else(|| "yaml".to_string());
+
+    // Generate timestamp
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+
+    let backup_name = format!("backup_{}_{}.{}", file_name, timestamp, extension);
+    let backup_path = parent_dir.join(&backup_name);
+
+    // Copy file
+    match fs::copy(&path, &backup_path) {
+        Ok(_) => {
+            // Clean up old backups beyond backup_count
+            let entries: Vec<_> = match fs::read_dir(parent_dir) {
+                Ok(entries) => entries.filter_map(|e| e.ok()).collect(),
+                Err(_) => vec![],
+            };
+
+            let mut backup_files: Vec<_> = entries
+                .iter()
+                .filter(|entry| {
+                    entry.path().is_file()
+                        && entry
+                            .file_name()
+                            .to_string_lossy()
+                            .starts_with(&format!("backup_{}_", file_name))
+                })
+                .collect();
+
+            // Sort by modified time (newest first)
+            backup_files.sort_by(|a, b| {
+                let a_modified = a.metadata().and_then(|m| m.modified()).unwrap_or(SystemTime::now());
+                let b_modified = b.metadata().and_then(|m| m.modified()).unwrap_or(SystemTime::now());
+                b_modified.cmp(&a_modified) // descending
+            });
+
+            // Remove excess backups
+            for entry in backup_files.into_iter().skip(backup_count as usize) {
+                let _ = fs::remove_file(entry.path());
+            }
+
+            ConfigResult {
+                success: true,
+                content: Some(backup_path.to_string_lossy().to_string()),
+                error: None,
+            }
+        }
+        Err(e) => ConfigResult {
+            success: false,
+            content: None,
+            error: Some(format!("Failed to create backup: {}", e)),
         },
     }
 }
@@ -665,6 +842,10 @@ pub fn run() {
             get_config_path,
             read_config,
             write_config,
+            get_gui_config_path,
+            read_gui_config,
+            write_gui_config,
+            create_config_backup,
             start_click_listener,
             stop_click_listener,
             is_listening_for_click,

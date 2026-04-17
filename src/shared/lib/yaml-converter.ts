@@ -1,6 +1,9 @@
 import { dump, load } from 'js-yaml'
-import type { InputActionsConfig, DeviceConfig, TriggerConfig } from './types'
+import type { InputActionsConfig, TriggerConfig } from './types'
 import { DeviceType, TriggerType, SwipeDirection, CircleDirection, TriggerEvent, MouseButton } from './types'
+
+// Тип, возвращающий допустимые триггеры для конкретного устройства
+type DeviceTriggers<T extends DeviceType> = NonNullable<InputActionsConfig['device']>[T]
 
 /**
  * Конвертация из формата файла inputactions во внутренний формат
@@ -51,18 +54,18 @@ export function parseInputActionsConfig(yamlContent: string): InputActionsConfig
       const triggers: TriggerConfig[] = gestures.map((gesture: any, index: number) => {
         return convertGestureToTrigger(gesture, deviceType, index)
       })
-      config.device![deviceType] = triggers
+      config.device![deviceType] = triggers as DeviceTriggers<DeviceType>
     }
     // Если это плоский массив (старый формат)
     else if (Array.isArray(deviceRaw)) {
-      config.device![deviceType] = deviceRaw as TriggerConfig[]
+      config.device![deviceType] = deviceRaw as DeviceTriggers<DeviceType>
     }
     // Если это объект с другими полями
     else if (typeof deviceRaw === 'object') {
       // Проверяем, есть ли там триггеры в виде массива
-      for (const [key, value] of Object.entries(deviceRaw)) {
+      for (const [_, value] of Object.entries(deviceRaw)) {
         if (Array.isArray(value) && value.length > 0 && value[0].type) {
-          config.device![deviceType] = value as TriggerConfig[]
+          config.device![deviceType] = value as DeviceTriggers<DeviceType>
           break
         }
       }
@@ -153,8 +156,8 @@ function convertActionInput(input: any): any {
 /**
  * Конвертация направления свайпа
  */
-function convertDirection(dir: string): number {
-  const dirMap: Record<string, number> = {
+function convertDirection(dir: string): SwipeDirection {
+  const dirMap: Record<string, SwipeDirection> = {
     'any': SwipeDirection.ANY,
     'left': SwipeDirection.LEFT,
     'right': SwipeDirection.RIGHT,
@@ -175,8 +178,8 @@ function convertDirection(dir: string): number {
 /**
  * Конвертация направления круга
  */
-function convertCircleDirection(dir: string): number {
-  const dirMap: Record<string, number> = {
+function convertCircleDirection(dir: string): CircleDirection {
+  const dirMap: Record<string, CircleDirection> = {
     'any': CircleDirection.ANY,
     'clockwise': CircleDirection.CLOCKWISE,
     'counter-clockwise': CircleDirection.COUNTERCLOCKWISE
@@ -282,8 +285,8 @@ function convertTriggerToGesture(trigger: TriggerConfig, deviceType: DeviceType)
 /**
  * Конвертация направления в строку
  */
-function convertDirectionToString(dir: number): string {
-  const dirMap: Record<number, string> = {
+function convertDirectionToString(dir: SwipeDirection): string {
+  const dirMap: Record<SwipeDirection, string> = {
     [SwipeDirection.ANY]: 'any',
     [SwipeDirection.LEFT]: 'left',
     [SwipeDirection.RIGHT]: 'right',
@@ -304,8 +307,8 @@ function convertDirectionToString(dir: number): string {
 /**
  * Конвертация направления круга в строку
  */
-function convertCircleDirectionToString(dir: number): string {
-  const dirMap: Record<number, string> = {
+function convertCircleDirectionToString(dir: CircleDirection): string {
+  const dirMap: Record<CircleDirection, string> = {
     [CircleDirection.ANY]: 'any',
     [CircleDirection.CLOCKWISE]: 'clockwise',
     [CircleDirection.COUNTERCLOCKWISE]: 'counter-clockwise'

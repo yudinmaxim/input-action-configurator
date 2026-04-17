@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useConfigStore } from '../shared/lib/stores/config'
+import { useGuiStore } from '../shared/lib/stores/gui'
 import { DeviceList } from '../widgets/DeviceList'
 import { TriggerList } from '../widgets/TriggerList'
 import { TriggerEditor } from '../widgets/TriggerEditor'
@@ -11,18 +12,57 @@ import BaseDropdown from '../shared/ui/base/BaseDropdown.vue'
 import BaseDropdownItem from '../shared/ui/base/BaseDropdownItem.vue'
 import BaseResizablePanel from '../shared/ui/base/BaseResizablePanel.vue'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import { createConfigBackup, getConfigPath } from '../shared/api/config'
 
 const store = useConfigStore()
+const guiStore = useGuiStore()
 const appWindow = getCurrentWindow()
 
 onMounted(async () => {
   try {
-    const result = await store.loadFromFile()
-    if (!result.success) {
-      console.warn('Failed to load config:', result.error)
+    const [configResult, guiResult] = await Promise.allSettled([
+      store.loadFromFile(),
+      guiStore.loadFromFile()
+    ])
+
+    if (configResult.status === 'fulfilled' && !configResult.value.success) {
+      console.warn('Failed to load config:', configResult.value.error)
+    }
+    if (guiResult.status === 'fulfilled' && !guiResult.value.success) {
+      console.warn('Failed to load GUI config:', guiResult.value.error)
+    }
+
+    // Apply GUI settings after loading
+    if (guiResult.status === 'fulfilled' && guiResult.value.success) {
+      const guiSettings = guiStore.settings.value
+      // Set trigger list width
+      if (guiSettings.triggerListWidth !== undefined) {
+        triggerListWidth.value = guiSettings.triggerListWidth
+      }
+      // Set selected device if it exists in config
+      if (guiSettings.selectedDevice) {
+        // Check if device exists in config
+        const deviceExists = store.devices.value.some(d => d.type === guiSettings.selectedDevice)
+        if (deviceExists) {
+          store.setSelectedDevice(guiSettings.selectedDevice as DeviceType)
+        }
+      }
+      // Set selected trigger if device matches
+      if (guiSettings.selectedTriggerId && store.state.selectedDevice) {
+        // Verify trigger exists
+        const triggers = store.state.config.device?.[store.state.selectedDevice]
+        const triggerExists = triggers?.some((t: any) => t.id === guiSettings.selectedTriggerId)
+        if (triggerExists) {
+          store.setSelectedTrigger(guiSettings.selectedTriggerId)
+        }
+      }
+      // Set config preview modal state
+      if (guiSettings.showConfigPreview !== undefined) {
+        showConfigPreview.value = guiSettings.showConfigPreview
+      }
     }
   } catch (e) {
-    console.warn('Cannot load config (Tauri not running):', e)
+    console.warn('Cannot load configs (Tauri not running):', e)
   }
 })
 
@@ -102,6 +142,20 @@ const handleDeleteCurrentTrigger = () => {
 
 const handleSave = async () => {
   try {
+    // Create backup if enabled
+    const guiSettings = guiStore.settings.value
+    if (guiSettings.enableBackups) {
+      try {
+        const configPath = await getConfigPath()
+        const backupResult = await createConfigBackup(configPath, guiSettings.backupCount)
+        if (!backupResult.success) {
+          console.warn('Failed to create backup:', backupResult.error)
+        }
+      } catch (backupError) {
+        console.warn('Cannot create backup:', backupError)
+      }
+    }
+
     const result = await store.saveToFile()
     if (!result.success) {
       console.warn('Failed to save:', result.error)
@@ -180,6 +234,44 @@ const confirmAddDevice = (deviceType: string | number) => {
 }
 
 const showConfigPreview = ref(false)
+
+// Watch for GUI state changes and save to store
+watch(triggerListWidth, (newWidth) => {
+  guiStore.setTriggerListWidth(newWidth)
+}, { immediate: true })
+
+watch(selectedDevice, (newDevice) => {
+  guiStore.setSelectedDevice(newDevice)
+}, { immediate: true })
+
+watch(selectedTriggerId, (newId) => {
+  guiStore.setSelectedTriggerId(newId)
+}, { immediate: true })
+
+watch(showConfigPreview, (newShow) => {
+  guiStore.setShowConfigPreview(newShow)
+}, { immediate: true })
+
+// Auto-save GUI settings when dirty (with debounce)
+let saveTimeout: number | null = null
+watch(() => guiStore.isDirty, (isDirty) => {
+  if (isDirty) {
+    if (saveTimeout) clearTimeout(saveTimeout)
+    saveTimeout = setTimeout(() => {
+      guiStore.saveToFile().then(result => {
+        if (!result.success) {
+          console.warn('Failed to auto-save GUI settings:', result.error)
+        }
+      })
+    }, 2000) // Save after 2 seconds of inactivity
+  }
+})
+
+// Save on window close
+onUnmounted(() => {
+  if (saveTimeout) clearTimeout(saveTimeout)
+  guiStore.saveToFile()
+})
 </script>
 
 <template>

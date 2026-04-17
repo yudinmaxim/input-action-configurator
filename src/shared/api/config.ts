@@ -63,3 +63,19 @@ export interface DeviceListResult {
 export async function getInputDevices(): Promise<DeviceListResult> {
   return await invoke('get_input_devices')
 }
+
+export async function getGuiConfigPath(): Promise<string> {
+  return await invoke('get_gui_config_path')
+}
+
+export async function readGuiConfig(): Promise<ConfigResult> {
+  return await invoke('read_gui_config')
+}
+
+export async function writeGuiConfig(content: string): Promise<ConfigResult> {
+  return await invoke('write_gui_config', { content })
+}
+
+export async function createConfigBackup(configPath: string, backupCount: number): Promise<ConfigResult> {
+  return await invoke('create_config_backup', { configPath, backupCount })
+}
