@@ -13,6 +13,7 @@ const emit = defineEmits<{
   'select-trigger': [id: string | null]
   'add-trigger': [trigger: any]
   'delete-trigger': [id: string]
+  'duplicate-trigger': [id: string]
 }>()
 
 const store = useConfigStore()
@@ -61,6 +62,7 @@ const selectedTriggerTriggers = computed(() => {
           :selected="selectedTriggerId === trigger.id"
           @select="emit('select-trigger', trigger.id || null)"
           @delete="emit('delete-trigger', trigger.id!)"
+          @duplicate="emit('duplicate-trigger', trigger.id!)"
         />
       </div>
     </div>

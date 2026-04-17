@@ -20,7 +20,7 @@ const emit = defineEmits<{
       <BaseInput
         :model-value="selectedTrigger.id || ''"
         label="ID"
-        @update:model-value="emit('update-field', 'id', $event)"
+        @blur="emit('update-field', 'id', $event)"
       >
         <template #append>
           <FieldHelp title="ID">

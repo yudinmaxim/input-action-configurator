@@ -59,6 +59,11 @@ const handleAddTrigger = (trigger: any) => {
   store.addTrigger(store.state.selectedDevice, trigger)
 }
 
+const handleDuplicateTrigger = (id: string) => {
+  if (!store.state.selectedDevice) return
+  store.duplicateTrigger(store.state.selectedDevice, id)
+}
+
 const handleDeleteTrigger = (id: string) => {
   if (!store.state.selectedDevice) return
   store.deleteTrigger(store.state.selectedDevice, id)
@@ -66,7 +71,13 @@ const handleDeleteTrigger = (id: string) => {
 
 const handleUpdateTriggerField = (field: string, value: unknown) => {
   if (!store.state.selectedDevice || !store.state.selectedTriggerId) return
-  store.updateTrigger(store.state.selectedDevice, store.state.selectedTriggerId, { [field]: value })
+  
+  const oldId = store.state.selectedTriggerId
+  store.updateTrigger(store.state.selectedDevice, oldId, { [field]: value })
+  
+  if (field === 'id') {
+    store.setSelectedTrigger(String(value))
+  }
 }
 
 const handleUpdateAction = (index: number, updates: any) => {
@@ -305,6 +316,7 @@ const showConfigPreview = ref(false)
           @select-trigger="handleSelectTrigger"
           @add-trigger="handleAddTrigger"
           @delete-trigger="handleDeleteTrigger"
+          @duplicate-trigger="handleDuplicateTrigger"
         />
       </template>
       

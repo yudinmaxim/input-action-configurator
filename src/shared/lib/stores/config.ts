@@ -204,6 +204,24 @@ export const useConfigStore = () => {
     saveToHistory()
   }
   
+  const duplicateTrigger = (deviceType: DeviceType, triggerId: string) => {
+    const triggers = state.config.device?.[deviceType]
+    if (!triggers) return
+    
+    const original = triggers.find((t: any) => t.id === triggerId)
+    if (!original) return
+    
+    const newTrigger = JSON.parse(JSON.stringify({
+      ...original,
+      id: `${original.id}-copy`
+    }))
+    
+    ;(state.config.device![deviceType] as any[]).push(newTrigger)
+    state.selectedTriggerId = newTrigger.id
+    state.isDirty = true
+    saveToHistory()
+  }
+  
   const updateTrigger = (deviceType: DeviceType, triggerId: string, updates: any) => {
     const triggers = state.config.device?.[deviceType]
     if (!triggers) return
@@ -359,6 +377,7 @@ export const useConfigStore = () => {
     setSelectedDevice,
     setSelectedTrigger,
     addTrigger,
+    duplicateTrigger,
     updateTrigger,
     deleteTrigger,
     deleteDevice,

@@ -19,6 +19,7 @@ const {
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
+  'blur': [value: string]
 }>()
 </script>
 
@@ -40,6 +41,7 @@ const emit = defineEmits<{
           disabled && 'bg-gray-50 cursor-not-allowed opacity-50'
         ]"
         @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+        @blur="emit('blur', ($event.target as HTMLInputElement).value)"
       />
       <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
         <slot name="append" />

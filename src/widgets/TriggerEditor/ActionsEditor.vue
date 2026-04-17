@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { BaseInput, BaseSelect } from '../../shared/ui/base'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
+import MouseButtonsSelector from '../../shared/ui/base/MouseButtonsSelector.vue'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 
 interface InputEntry {
@@ -153,9 +154,13 @@ function removeInputEntry(actionIndex: number, entryIndex: number) {
 function changeInputEntryType(actionIndex: number, entryIndex: number, newType: 'keyboard' | 'mouse') {
   const action = list.value[actionIndex]
   const newInput = [...(action.input || [])]
-  newInput[entryIndex] = newType === 'keyboard' 
-    ? { keyboard: newInput[entryIndex].mouse || [] }
-    : { mouse: newInput[entryIndex].keyboard || [] }
+  
+  if (newType === 'keyboard') {
+    newInput[entryIndex] = { keyboard: [] }
+  } else {
+    newInput[entryIndex] = { mouse: ['+left'] }
+  }
+  
   emit('update-action', actionIndex, { input: newInput })
 }
 
@@ -203,6 +208,9 @@ function updateKeyboardKeys(actionIndex: number, entryIndex: number, keys: strin
 }
 
 function parseMouseAction(action: string) {
+  if (!action || typeof action !== 'string') {
+    return { type: '+', button: '' }
+  }
   const parts = action.split(' ')
   const cmd = parts[0]
   if (cmd === 'move_by') return { type: 'move_by', x: parts[1] || '0', y: parts[2] || '0' }
@@ -211,6 +219,11 @@ function parseMouseAction(action: string) {
   if (cmd === 'wheel') return { type: 'wheel', x: parts[1] || '0', y: parts[2] || '0' }
   if (cmd.startsWith('+')) return { type: '+', button: cmd.slice(1) }
   if (cmd.startsWith('-')) return { type: '-', button: cmd.slice(1) }
+  if (cmd.startsWith('click')) {
+    const buttonsPart = action.replace('click', '').trim()
+    const buttons = buttonsPart ? buttonsPart.split(',').map(b => b.trim()).filter(Boolean) : []
+    return { type: 'click', buttons }
+  }
   return { type: '+', button: cmd }
 }
 
@@ -219,7 +232,88 @@ function formatMouseAction(parsed: any) {
   if (parsed.type === 'move_by_delta') return parsed.mult !== '1' ? `move_by_delta ${parsed.mult}` : 'move_by_delta'
   if (parsed.type === 'move_to') return `move_to ${parsed.x} ${parsed.y}`
   if (parsed.type === 'wheel') return `wheel ${parsed.x} ${parsed.y}`
+  if (parsed.type === 'click') return parsed.buttons?.length > 0 ? `click ${parsed.buttons.join(', ')}` : 'click'
   return `${parsed.type}${parsed.button || ''}`
+}
+
+function isMouseClick(entry: any): boolean {
+  const actions = entry.mouse || []
+  if (actions.length === 0) return false
+  return !actions.some((a: string) => isMouseActionCommand(a))
+}
+
+function isMouseSimple(entry: any): boolean {
+  const actions = entry.mouse || []
+  if (actions.length === 0) return true
+  
+  const firstAction = String(actions[0])
+  if (firstAction.startsWith('+') || firstAction.startsWith('-')) {
+    const button = firstAction.slice(1)
+    if (MOUSE_BUTTON_NAMES.includes(button)) return true
+  }
+  
+  return !actions.some((a: string) => isMouseActionCommand(a))
+}
+
+function getMouseButtonsForSelector(entry: any): string[] {
+  const actions = entry.mouse || []
+  return actions.map((a: string) => {
+    const clean = a.replace(/^[+-]/, '')
+    return clean
+  })
+}
+
+function getMouseActionMode(entry: any): string {
+  const actions = entry.mouse || []
+  if (actions.length === 0) return 'click'
+  if (actions.length > 1) return 'custom'
+  
+  const firstAction = String(actions[0])
+  
+  if (firstAction.startsWith('+')) return 'down'
+  if (firstAction.startsWith('-')) return 'up'
+  
+  return 'click'
+}
+
+function getMouseActionOptions(entry: any): Array<{value: string, label: string}> {
+  const actions = entry.mouse || []
+  if (actions.length > 1) {
+    return [{ value: 'custom', label: 'custom' }]
+  }
+  return [
+    { value: 'click', label: 'click' },
+    { value: 'down', label: 'down' },
+    { value: 'up', label: 'up' },
+    { value: 'custom', label: 'custom' },
+  ]
+}
+
+function setMouseActionMode(actionIndex: number, entryIndex: number, mode: string) {
+  const action = list.value[actionIndex]
+  const entry = action.input?.[entryIndex]
+  const currentActions = [...(entry?.mouse || [])]
+  
+  if (mode === 'custom') {
+    updateMouseActions(actionIndex, entryIndex, currentActions)
+    return
+  }
+  
+  let newActions: string[] = []
+  
+  switch (mode) {
+    case 'click':
+      newActions = ['left']
+      break
+    case 'down':
+      newActions = ['+left']
+      break
+    case 'up':
+      newActions = ['-left']
+      break
+  }
+  
+  updateMouseActions(actionIndex, entryIndex, newActions)
 }
 
 function updateMouseActions(actionIndex: number, entryIndex: number, actions: string[]) {
@@ -255,7 +349,17 @@ const MOUSE_BUTTONS = [
   { value: 'extra', label: 'extra' },
 ]
 
+const MOUSE_ACTION_TYPES = ['move_by', 'move_by_delta', 'move_to', 'wheel']
+const MOUSE_BUTTON_NAMES = MOUSE_BUTTONS.map(b => b.value)
+
+function isMouseActionCommand(action: string): boolean {
+  const cmd = action.split(' ')[0]
+  if (MOUSE_ACTION_TYPES.includes(cmd)) return true
+  return false
+}
+
 const MOUSE_TYPES = [
+  { value: 'click', label: 'click' },
   { value: '+', label: '+button' },
   { value: '-', label: '-button' },
   { value: 'move_by_delta', label: 'move_by_delta' },
@@ -384,6 +488,15 @@ Special (for update/tick):
                     class="w-36"
                     @update:model-value="(v) => changeInputEntryType(actionIndex, entryIndex, String(v) as 'keyboard' | 'mouse')"
                   />
+                  <template v-if="getInputType(entry) === 'mouse'">
+                    <span class="text-gray-400">→</span>
+                    <BaseSelect
+                      :model-value="getMouseActionMode(entry)"
+                      :options="getMouseActionOptions(entry)"
+                      class="w-28"
+                      @update:model-value="(mode) => setMouseActionMode(actionIndex, entryIndex, String(mode))"
+                    />
+                  </template>
                 </div>
                 <button 
                   class="delete-btn"
@@ -422,88 +535,112 @@ Special (for update/tick):
               <!-- Mouse -->
               <template v-if="getInputType(entry) === 'mouse'">
                 <div class="flex flex-col gap-1">
-                  <div v-for="(mouseAction, mi) in entry.mouse || []" :key="mi" class="flex gap-2 items-center">
-                    <BaseSelect
-                      :model-value="parseMouseAction(mouseAction).type"
-                      :options="MOUSE_TYPES"
-                      class="w-32"
-                      @update:model-value="(type) => {
-                        const parsed = parseMouseAction(mouseAction)
-                        parsed.type = String(type)
-                        const actions = [...(entry.mouse || [])]
-                        actions[mi] = formatMouseAction(parsed)
+                  <!-- Click/Down/Up mode -->
+                  <div v-if="isMouseSimple(entry)" class="mt-2">
+                    <label class="text-xs text-gray-500 mb-2 block">Buttons</label>
+                    <MouseButtonsSelector
+                      :model-value="getMouseButtonsForSelector(entry)"
+                      @update:model-value="(buttons) => {
+                        const mode = getMouseActionMode(entry)
+                        const prefix = mode === 'down' ? '+' : mode === 'up' ? '-' : ''
+                        const actions = (buttons as string[]).map(b => prefix + b)
                         updateMouseActions(actionIndex, entryIndex, actions)
                       }"
                     />
-                    
-                    <template v-if="parseMouseAction(mouseAction).type === '+' || parseMouseAction(mouseAction).type === '-'">
+                  </div>
+                  
+                  <!-- Custom actions list -->
+                  <template v-else>
+                    <div v-for="(mouseAction, mi) in entry.mouse || []" :key="mi" class="flex gap-2 items-center">
                       <BaseSelect
-                        :model-value="parseMouseAction(mouseAction).button"
-                        :options="MOUSE_BUTTONS"
-                        placeholder="button"
-                        class="flex-1"
-                        @update:model-value="(btn) => {
+                        :model-value="parseMouseAction(mouseAction).type"
+                        :options="[
+                          { value: '+', label: '+button' },
+                          { value: '-', label: '-button' },
+                          { value: 'move_by_delta', label: 'move_by_delta' },
+                          { value: 'move_by', label: 'move_by x y' },
+                          { value: 'move_to', label: 'move_to x y' },
+                          { value: 'wheel', label: 'wheel x y' },
+                        ]"
+                        class="w-32"
+                        @update:model-value="(type) => {
                           const parsed = parseMouseAction(mouseAction)
-                          parsed.button = String(btn)
+                          parsed.type = String(type)
                           const actions = [...(entry.mouse || [])]
                           actions[mi] = formatMouseAction(parsed)
                           updateMouseActions(actionIndex, entryIndex, actions)
                         }"
                       />
-                    </template>
-                    
-                    <template v-else-if="['move_by', 'move_to', 'wheel'].includes(parseMouseAction(mouseAction).type)">
-                      <BaseInput
-                        :model-value="parseMouseAction(mouseAction).x"
-                        type="number"
-                        placeholder="x"
-                        class="w-16"
-                        @update:model-value="(x) => {
-                          const parsed = parseMouseAction(mouseAction)
-                          parsed.x = String(x)
+                      
+                      <template v-if="parseMouseAction(mouseAction).type === '+' || parseMouseAction(mouseAction).type === '-'">
+                        <BaseSelect
+                          :model-value="parseMouseAction(mouseAction).button"
+                          :options="MOUSE_BUTTONS"
+                          placeholder="button"
+                          class="flex-1"
+                          @update:model-value="(btn) => {
+                            const parsed = parseMouseAction(mouseAction)
+                            parsed.button = String(btn)
+                            const actions = [...(entry.mouse || [])]
+                            actions[mi] = formatMouseAction(parsed)
+                            updateMouseActions(actionIndex, entryIndex, actions)
+                          }"
+                        />
+                      </template>
+                      
+                      <template v-else-if="['move_by', 'move_to', 'wheel'].includes(parseMouseAction(mouseAction).type)">
+                        <BaseInput
+                          :model-value="parseMouseAction(mouseAction).x"
+                          type="number"
+                          placeholder="x"
+                          class="w-16"
+                          @update:model-value="(x) => {
+                            const parsed = parseMouseAction(mouseAction)
+                            parsed.x = String(x)
+                            const actions = [...(entry.mouse || [])]
+                            actions[mi] = formatMouseAction(parsed)
+                            updateMouseActions(actionIndex, entryIndex, actions)
+                          }"
+                        />
+                        <BaseInput
+                          :model-value="parseMouseAction(mouseAction).y"
+                          type="number"
+                          placeholder="y"
+                          class="w-16"
+                          @update:model-value="(y) => {
+                            const parsed = parseMouseAction(mouseAction)
+                            parsed.y = String(y)
+                            const actions = [...(entry.mouse || [])]
+                            actions[mi] = formatMouseAction(parsed)
+                            updateMouseActions(actionIndex, entryIndex, actions)
+                          }"
+                        />
+                      </template>
+                      
+                      <button 
+                        class="delete-btn"
+                        @click="() => {
                           const actions = [...(entry.mouse || [])]
-                          actions[mi] = formatMouseAction(parsed)
+                          actions.splice(mi, 1)
                           updateMouseActions(actionIndex, entryIndex, actions)
                         }"
-                      />
-                      <BaseInput
-                        :model-value="parseMouseAction(mouseAction).y"
-                        type="number"
-                        placeholder="y"
-                        class="w-16"
-                        @update:model-value="(y) => {
-                          const parsed = parseMouseAction(mouseAction)
-                          parsed.y = String(y)
-                          const actions = [...(entry.mouse || [])]
-                          actions[mi] = formatMouseAction(parsed)
-                          updateMouseActions(actionIndex, entryIndex, actions)
-                        }"
-                      />
-                    </template>
+                      >
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
                     
                     <button 
-                      class="delete-btn"
+                      class="add-small-btn"
                       @click="() => {
-                        const actions = [...(entry.mouse || [])]
-                        actions.splice(mi, 1)
+                        const actions = [...(entry.mouse || []), '+left']
                         updateMouseActions(actionIndex, entryIndex, actions)
                       }"
                     >
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
+                      + action
                     </button>
-                  </div>
-                  
-                  <button 
-                    class="add-small-btn"
-                    @click="() => {
-                      const actions = [...(entry.mouse || []), '+left']
-                      updateMouseActions(actionIndex, entryIndex, actions)
-                    }"
-                  >
-                    + mouse action
-                  </button>
+                  </template>
                 </div>
               </template>
             </div>

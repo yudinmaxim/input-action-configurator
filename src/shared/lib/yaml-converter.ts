@@ -205,7 +205,12 @@ export function dumpInputActionsConfig(config: InputActionsConfig): string {
     }
   }
 
-  return dump(output, { lineWidth: -1, noRefs: true, indent: 2 })
+  let yaml = dump(output, { lineWidth: -1, noRefs: true, indent: 2 })
+  
+  // Убираем кавычки с 'on' (YAML парсит on как зарезервированное слово)
+  yaml = yaml.replace(/['"]on['"]\s*:/g, 'on:')
+  
+  return yaml
 }
 
 /**
