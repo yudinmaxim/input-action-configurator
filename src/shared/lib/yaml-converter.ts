@@ -129,6 +129,24 @@ function convertGestureToTrigger(gesture: any, deviceType: DeviceType, index: nu
     trigger.circle_direction = convertCircleDirection(gesture.circle_direction)
   }
 
+  // Threshold и speed
+  if (gesture.threshold !== undefined) {
+    trigger.threshold = gesture.threshold
+  }
+
+  if (gesture.speed !== undefined) {
+    trigger.speed = gesture.speed as any
+  }
+
+  // Acceleration и delay (если есть)
+  if (gesture.acceleration !== undefined) {
+    ;(trigger as any).acceleration = gesture.acceleration
+  }
+
+  if (gesture.delay !== undefined) {
+    ;(trigger as any).delay = gesture.delay
+  }
+
   return trigger
 }
 
@@ -279,6 +297,25 @@ function convertTriggerToGesture(trigger: TriggerConfig, deviceType: DeviceType)
 
   if (trigger.circle_direction !== undefined) {
     gesture.circle_direction = convertCircleDirectionToString(trigger.circle_direction)
+  }
+
+  // Threshold и speed
+  if (trigger.threshold !== undefined) {
+    gesture.threshold = trigger.threshold
+  }
+
+  if (trigger.speed !== undefined) {
+    gesture.speed = trigger.speed
+  }
+
+  // Acceleration (если есть в типе)
+  if ('acceleration' in trigger && trigger.acceleration !== undefined) {
+    gesture.acceleration = trigger.acceleration
+  }
+
+  // Delay
+  if ('delay' in trigger && trigger.delay !== undefined) {
+    gesture.delay = trigger.delay
   }
 
   // Убираем undefined поля

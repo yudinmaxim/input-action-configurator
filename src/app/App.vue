@@ -12,7 +12,7 @@ import BaseDropdown from '../shared/ui/base/BaseDropdown.vue'
 import BaseDropdownItem from '../shared/ui/base/BaseDropdownItem.vue'
 import BaseResizablePanel from '../shared/ui/base/BaseResizablePanel.vue'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { createConfigBackup, getConfigPath } from '../shared/api/config'
+import { createConfigBackup } from '../shared/api/config'
 
 const store = useConfigStore()
 const guiStore = useGuiStore()
@@ -144,10 +144,9 @@ const handleSave = async () => {
   try {
     // Create backup if enabled
     const guiSettings = guiStore.settings.value
-    if (guiSettings.enableBackups) {
+    if (guiSettings.enableBackups && guiSettings.configFilePath) {
       try {
-        const configPath = await getConfigPath()
-        const backupResult = await createConfigBackup(configPath, guiSettings.backupCount)
+        const backupResult = await createConfigBackup(guiSettings.configFilePath, guiSettings.backupCount)
         if (!backupResult.success) {
           console.warn('Failed to create backup:', backupResult.error)
         }
@@ -200,7 +199,7 @@ const handleTitleBarMouseDown = async (event: MouseEvent) => {
   if (target.closest('button, [role="button"], .control-btn')) {
     return
   }
-  
+
   try {
     await appWindow.startDragging()
   } catch (e) {
@@ -279,12 +278,16 @@ onUnmounted(() => {
     <!-- Custom Title Bar -->
     <header 
       class="titlebar flex items-center justify-between px-4 bg-white border-b border-gray-200 select-none"
-      @mousedown="handleTitleBarMouseDown"
     >
       <!-- Draggable area (clicks in the middle, not near edges) -->
-      <div class="flex-1 flex items-center gap-3 min-w-0 h-10">
-        <h1 class="text-base font-semibold text-gray-800 truncate">Input Action Configurator</h1>
-        <span v-if="isDirty" class="text-xs text-orange-600 bg-orange-100 px-2 py-0.5 rounded shrink-0">Unsaved changes</span>
+      <div
+        class="flex-1 flex items-center gap-3 min-w-0 h-10 mt-2"
+        @mousedown="handleTitleBarMouseDown"
+      >
+        <div class="flex flex-col -mt-1 min-w-0">
+          <h1 class="text-base font-semibold text-gray-800 truncate">Input Action Configurator</h1>
+        </div>
+        <span v-if="isDirty" class="text-xs text-orange-600 bg-orange-100 px-2 py-0.5 rounded shrink-0 -mt-2">Unsaved changes</span>
       </div>
       
       <!-- Right side - Window controls (no drag) -->

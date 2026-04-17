@@ -22,12 +22,12 @@ export async function getConfigPath(): Promise<string> {
   return await invoke('get_config_path')
 }
 
-export async function readConfig(): Promise<ConfigResult> {
-  return await invoke('read_config')
+export async function readConfig(configPath?: string): Promise<ConfigResult> {
+  return await invoke('read_config', { configPath })
 }
 
-export async function writeConfig(content: string): Promise<ConfigResult> {
-  return await invoke('write_config', { content })
+export async function writeConfig(content: string, configPath?: string): Promise<ConfigResult> {
+  return await invoke('write_config', { content, configPath })
 }
 
 export async function startClickListener(): Promise<boolean> {

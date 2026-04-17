@@ -1,5 +1,5 @@
 import { reactive, computed } from 'vue'
-import { readGuiConfig, writeGuiConfig, getConfigPath, type ConfigResult } from '../../api/config'
+import { readGuiConfig, writeGuiConfig, type ConfigResult } from '../../api/config'
 
 export interface GuiSettings {
   version: string
@@ -21,7 +21,7 @@ export interface GuiSettings {
 
 const defaultSettings: GuiSettings = {
   version: '1.0',
-  configFilePath: null,
+  configFilePath: null, // Will be set to default in configStore if null
   triggerListWidth: 300,
   selectedDevice: null,
   selectedTriggerId: null,
@@ -94,34 +94,21 @@ export const useGuiStore = () => {
       if (result.success && result.content) {
         try {
           const parsed = JSON.parse(result.content)
-          // Merge with defaults, preserving any new fields
-          state.settings = { ...defaultSettings, ...parsed }
+          // Merge with defaults using Object.assign to preserve reactivity
+          Object.assign(state.settings, { ...defaultSettings, ...parsed })
           state.isDirty = false
-
-          // Check if loaded config file path matches current config
-          try {
-            const currentConfigPath = await getConfigPath()
-            if (state.settings.configFilePath !== currentConfigPath) {
-              // GUI settings belong to a different config file, reset device/trigger selection
-              state.settings.selectedDevice = null
-              state.settings.selectedTriggerId = null
-              state.isDirty = true
-            }
-          } catch (e) {
-            console.warn('Cannot get current config path:', e)
-          }
         } catch (parseError) {
           console.warn('Failed to parse GUI config, using defaults:', parseError)
-          state.settings = { ...defaultSettings }
+          Object.assign(state.settings, defaultSettings)
         }
       } else {
         // No config file or error, use defaults
-        state.settings = { ...defaultSettings }
+        Object.assign(state.settings, defaultSettings)
       }
       return result
     } catch (e) {
       console.warn('Cannot load GUI config (Tauri not running?):', e)
-      state.settings = { ...defaultSettings }
+      Object.assign(state.settings, defaultSettings)
       return { success: false, content: null, error: String(e) }
     } finally {
       state.isLoading = false
@@ -154,7 +141,7 @@ export const useGuiStore = () => {
   }
 
   const resetToDefaults = () => {
-    state.settings = { ...defaultSettings }
+    Object.assign(state.settings, defaultSettings)
     state.isDirty = true
   }
 

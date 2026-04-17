@@ -33,22 +33,25 @@ pub struct WindowInfoResult {
     pub error: Option<String>,
 }
 
-#[tauri::command]
-fn get_config_path() -> String {
-    let config_dir = dirs::config_dir()
-        .unwrap_or_else(|| PathBuf::from("."))
-        .join("inputactions");
-
-    config_dir
-        .join("test.config.yaml")
-        .to_string_lossy()
-        .to_string()
+fn expand_tilde(path: &str) -> PathBuf {
+    if path.starts_with("~/") || path == "~" {
+        dirs::home_dir()
+            .unwrap_or_else(|| PathBuf::from("."))
+            .join(&path[2..])
+    } else {
+        PathBuf::from(path)
+    }
 }
 
 #[tauri::command]
-fn read_config() -> ConfigResult {
-    let config_path = get_config_path();
-    let path = PathBuf::from(&config_path);
+fn read_config(config_path: Option<String>) -> ConfigResult {
+    let config_path = config_path.unwrap_or_else(|| {
+        let config_dir = dirs::config_dir()
+            .unwrap_or_else(|| PathBuf::from("."))
+            .join("inputactions");
+        config_dir.join("config.yaml").to_string_lossy().to_string()
+    });
+    let path = expand_tilde(&config_path);
 
     // Ensure directory exists
     if let Some(parent) = path.parent() {
@@ -88,9 +91,14 @@ fn read_config() -> ConfigResult {
 }
 
 #[tauri::command]
-fn write_config(content: String) -> ConfigResult {
-    let config_path = get_config_path();
-    let path = PathBuf::from(&config_path);
+fn write_config(content: String, config_path: Option<String>) -> ConfigResult {
+    let config_path = config_path.unwrap_or_else(|| {
+        let config_dir = dirs::config_dir()
+            .unwrap_or_else(|| PathBuf::from("."))
+            .join("inputactions");
+        config_dir.join("config.yaml").to_string_lossy().to_string()
+    });
+    let path = expand_tilde(&config_path);
 
     // Ensure directory exists
     if let Some(parent) = path.parent() {
@@ -839,7 +847,6 @@ fn get_input_devices() -> DeviceListResult {
 pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            get_config_path,
             read_config,
             write_config,
             get_gui_config_path,

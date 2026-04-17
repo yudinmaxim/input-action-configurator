@@ -15,6 +15,7 @@ import {
 } from '../types'
 import { readConfig, writeConfig, type ConfigResult } from '../../api/config'
 import { parseInputActionsConfig, dumpInputActionsConfig } from '../yaml-converter'
+import { useGuiStore } from './gui'
 
 const initialConfig = {
   device: {
@@ -335,8 +336,11 @@ export const useConfigStore = () => {
   }
   
   const loadFromFile = async (): Promise<ConfigResult> => {
+    const guiStore = useGuiStore()
+    const configPath = guiStore.settings.value.configFilePath || '~/.config/inputactions/config.yaml'
+    
     try {
-      const result = await readConfig()
+      const result = await readConfig(configPath)
       if (result.success && result.content) {
         try {
           const parsed = parseInputActionsConfig(result.content)
@@ -356,9 +360,12 @@ export const useConfigStore = () => {
   }
   
   const saveToFile = async (): Promise<ConfigResult> => {
+    const guiStore = useGuiStore()
+    const configPath = guiStore.settings.value.configFilePath || '~/.config/inputactions/config.yaml'
+    
     try {
       const configYaml = dumpInputActionsConfig(state.config)
-      const result = await writeConfig(configYaml)
+      const result = await writeConfig(configYaml, configPath)
       if (result.success) {
         state.isDirty = false
       }
