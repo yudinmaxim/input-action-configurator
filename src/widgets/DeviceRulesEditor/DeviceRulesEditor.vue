@@ -69,17 +69,17 @@ const DEVICE_CONDITION_VARS = [
 ]
 
 const DEVICE_PROPERTIES = [
-  { key: 'ignore', label: 'Ignore', description: 'Игнорировать устройство полностью (не обрабатывать события)', type: 'boolean' },
-  { key: 'grab', label: 'Grab', description: 'Перехватывать события устройства (эксклюзивный доступ)', type: 'boolean' },
-  { key: 'buttonpad', label: 'Buttonpad', description: 'Устройство является кнопочным тачпадом (без、物理ческих кнопок)', type: 'boolean' },
-  { key: 'handle_evdev_events', label: 'Handle Evdev Events', description: 'Обрабатывать сырые события evdev', type: 'boolean' },
-  { key: 'motion_timeout', label: 'Motion Timeout (ms)', description: 'Таймаут бездействия движения в миллисекундах', type: 'number' },
-  { key: 'motion_threshold', label: 'Motion Threshold', description: 'Порог движения для начала отслеживания', type: 'number' },
-  { key: 'motion_threshold_2', label: 'Motion Threshold 2', description: 'Вторичный порог движения (для многоуровневого отслеживания)', type: 'number' },
-  { key: 'motion_threshold_3', label: 'Motion Threshold 3', description: 'Третичный порог движения', type: 'number' },
-  { key: 'press_timeout', label: 'Press Timeout (ms)', description: 'Таймаут нажатия в миллисекундах (до определения жеста)', type: 'number' },
-  { key: 'click_timeout', label: 'Click Timeout (ms)', description: 'Таймаут между кликами для определения мульти-клика', type: 'number' },
-  { key: 'unblock_buttons_on_timeout', label: 'Unblock Buttons on Timeout', description: 'Разблокировать кнопки после таймаута', type: 'boolean' },
+  { key: 'ignore', label: 'Ignore', description: 'Полностью игнорировать устройство. Все события от него будут отброшены и не попадут в систему.', type: 'boolean' },
+  { key: 'grab', label: 'Grab', description: 'Эксклюзивный захват устройства. Другие приложения не смогут получать события от этого устройства.', type: 'boolean' },
+  { key: 'buttonpad', label: 'Buttonpad', description: 'Тачпад без физических кнопок (кнопки встроены в поверхность, как на MacBook). Клик определяется по силе нажатия.', type: 'boolean' },
+  { key: 'handle_evdev_events', label: 'Handle Evdev Events', description: 'Обрабатывать сырые события ядра Linux (evdev). Обычно включено по умолчанию.', type: 'boolean' },
+  { key: 'motion_timeout', label: 'Motion Timeout (ms)', description: 'Через сколько миллисекунд без движения считать жест завершённым. Влияет на определение конца swipe/pinch жестов.', type: 'number' },
+  { key: 'motion_threshold', label: 'Motion Threshold', description: 'Минимальное расстояние движения (в условных единицах) чтобы начать отслеживать жест. Защита от случайных касаний.', type: 'number' },
+  { key: 'motion_threshold_2', label: 'Motion Threshold 2', description: 'Порог для второго уровня движения. Используется в сложных жестах (например, разное поведение при слабом vs сильном жесте).', type: 'number' },
+  { key: 'motion_threshold_3', label: 'Motion Threshold 3', description: 'Порог для третьего уровня движения. Позволяет задать три уровня чувствительности жеста.', type: 'number' },
+  { key: 'press_timeout', label: 'Press Timeout (ms)', description: 'Максимальное время удержания касания до определения типа жеста (hold vs swipe). Если превышено - считается hold.', type: 'number' },
+  { key: 'click_timeout', label: 'Click Timeout (ms)', description: 'Максимальный интервал между двумя касаниями для определения двойного клика. Стандартное значение ~500ms.', type: 'number' },
+  { key: 'unblock_buttons_on_timeout', label: 'Unblock Buttons on Timeout', description: 'Разблокировать программные кнопки тачпада если физические кнопки заблокированы дольше чем press_timeout.', type: 'boolean' },
 ]
 
 const addRule = () => {
