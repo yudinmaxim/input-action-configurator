@@ -7,6 +7,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "tauri": "cargo-tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build"
@@ -18,13 +21,16 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.10.1",
+    "@testing-library/vue": "^8.1.0",
     "@types/js-yaml": "^4.0.9",
     "@unocss/preset-icons": "^66.6.8",
     "@unocss/preset-uno": "^66.6.8",
     "@vitejs/plugin-vue": "^5.2.0",
+    "jsdom": "^29.0.2",
     "typescript": "^5.4.0",
     "unocss": "^66.6.8",
     "vite": "^6.0.0",
+    "vitest": "^4.1.4",
     "vue-tsc": "^2.0.0"
   }
 }

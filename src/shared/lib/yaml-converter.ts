@@ -31,6 +31,15 @@ function normalizeDeviceRules(rules: any[]): any[] {
 export function parseInputActionsConfig(yamlContent: string): InputActionsConfig {
   const raw = load(yamlContent) as any
   
+  // Пустой YAML возвращает undefined/null - считаем это валидным пустым конфигом
+  if (raw === null || raw === undefined) {
+    return {
+      device: {},
+      device_rules: [],
+      settings: {}
+    }
+  }
+  
   if (!raw || typeof raw !== 'object') {
     throw new Error('Invalid config format: root must be an object')
   }
