@@ -10,7 +10,7 @@ interface IProps {
   confirmVariant?: 'primary' | 'danger'
 }
 
-const props = withDefaults(defineProps<IProps>(), {
+withDefaults(defineProps<IProps>(), {
   title: 'Подтверждение',
   confirmText: 'Да',
   cancelText: 'Отмена',

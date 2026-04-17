@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { BaseButton } from '../../shared/ui/base'
 import { BasicProperties, DirectionSettings, ActionsEditor, Options, ConditionsEditor } from '../TriggerEditor'
 
 interface Props {

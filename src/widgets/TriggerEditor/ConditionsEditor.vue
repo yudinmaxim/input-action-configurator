@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { BaseInput, BaseSelect, BaseButton } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
+import ConditionGroup from '../../shared/ui/base/ConditionGroup.vue'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
 import { getActiveWindow } from '../../entities/window-detector'
 
@@ -212,14 +213,6 @@ const onVal = (i: number, v: string) => {
   }
 }
 
-const onSubVar = (i: number, subI: number, v: string | string[]) => {
-  const value = Array.isArray(v) ? v[0] : v
-  if (isGroup(list.value[i])) {
-    list.value[i].conditions[subI].variable = value
-    saveConditions()
-  }
-}
-
 const onSubVal = (i: number, subI: number, v: string) => {
   if (isGroup(list.value[i])) {
     list.value[i].conditions[subI].value = v
@@ -227,17 +220,9 @@ const onSubVal = (i: number, subI: number, v: string) => {
   }
 }
 
-const addSub = (i: number) => {
+const onGroupUpdate = (i: number, updatedGroup: GroupCondition) => {
   if (isGroup(list.value[i])) {
-    const newCondition = { variable: '$window_class', value: '' }
-    list.value[i].conditions.push(newCondition)
-    saveConditions()
-  }
-}
-
-const removeSub = (i: number, subI: number) => {
-  if (isGroup(list.value[i])) {
-    list.value[i].conditions.splice(subI, 1)
+    list.value[i] = updatedGroup
     saveConditions()
   }
 }
@@ -371,11 +356,20 @@ any: [$window_class==firefox, $window_class==chrome]
   <div class="bg-white border border-gray-200 rounded-md p-4">
     <div class="flex items-center gap-2 mb-4">
       <h3 class="text-lg font-semibold text-gray-800">Conditions</h3>
-      <FieldHelp><slot>{{ helpText }}</slot></FieldHelp>
+      <FieldHelp>{{ helpText }}</FieldHelp>
     </div>
     
     <div class="flex flex-col gap-2">
-        <div v-for="(c, i) in list" :key="i" 
+      <div v-for="(c, i) in list" :key="i">
+        <ConditionGroup
+          v-if="isGroup(c)"
+          :model-value="getGroup(c)"
+          @update:model-value="(v) => onGroupUpdate(i, v)"
+          @delete="remove(i)"
+          @pick-window="(subI) => startCountdown(i, subI)"
+        />
+        <div
+          v-else
           class="flex flex-col gap-2 p-3 rounded-lg border"
           :class="TYPE_COLORS[getRootType(c)]"
         >
@@ -394,56 +388,10 @@ any: [$window_class==firefox, $window_class==chrome]
             </div>
             <button class="delete-btn" @click="remove(i)">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
           </div>
-          
-          <template v-if="isGroup(c)">
-            <div class="flex flex-col gap-1">
-              <div v-for="(sub, subI) in (getGroup(c).conditions || [])" :key="subI" class="flex gap-2">
-                <BaseSelect
-                  :model-value="sub.variable || ''"
-                  :options="VARIABLES"
-                  placeholder="$var"
-                  class="w-40"
-                  @update:model-value="(v) => onSubVar(i, subI, v)"
-                />
-                <BaseInput
-                  :model-value="sub.value"
-                  placeholder="значение"
-                  class="flex-1"
-                  @update:model-value="(v) => onSubVal(i, subI, v)"
-                />
-                <button 
-                  v-if="WINDOW_VARIABLES.includes(sub.variable)"
-                  class="app-btn"
-                  title="Кликните, затем переключитесь на нужное окно. После клика у вас будет 3 секунды на активацию нужного приложения."
-                  @click="startCountdown(i, subI)"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="3" width="20" height="14" rx="2"/>
-                    <path d="M8 21h8M12 17v4"/>
-                  </svg>
-                </button>
-                <button class="delete-btn" @click="removeSub(i, subI)">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </button>
-              </div>
-              <BaseButton variant="ghost" size="sm" @click="addSub(i)">
-                <template #icon-left>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M5 12h14"/>
-                  </svg>
-                </template>
-                добавить условие
-              </BaseButton>
-            </div>
-          </template>
-          
-          <template v-else>
           <div class="flex items-end gap-2">
             <BaseSelect
               :model-value="getSimple(c).variable || ''"
@@ -483,76 +431,44 @@ any: [$window_class==firefox, $window_class==chrome]
               </svg>
             </button>
           </div>
-        </template>
+        </div>
       </div>
       
       <div class="flex flex-wrap gap-2">
-        <BaseButton variant="blue" @click="doAddSimple">
+        <BaseButton variant="blue" title="Простое условие: проверяет $переменная == значение" @click="doAddSimple">
           <template #icon-left>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14"/>
             </svg>
           </template>
           condition
-          <template #icon-right>
-            <span @click.stop>
-              <FieldHelp>
-                <template #title>Простое условие</template>
-                Проверяет $переменная == значение
-              </FieldHelp>
-            </span>
-          </template>
         </BaseButton>
         
-        <BaseButton variant="green" @click="doAddGroup('any')">
+        <BaseButton variant="green" title="Любое из списка: активируется если хотя бы одно условие выполняется (OR)" @click="doAddGroup('any')">
           <template #icon-left>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14"/>
             </svg>
           </template>
           any
-          <template #icon-right>
-            <span @click.stop>
-              <FieldHelp>
-                <template #title>Любое из списка</template>
-                Активируется, если хотя бы одно выполняется
-              </FieldHelp>
-            </span>
-          </template>
         </BaseButton>
         
-        <BaseButton variant="amber" @click="doAddGroup('all')">
+        <BaseButton variant="amber" title="Все из списка: активируется только если все условия выполняются (AND)" @click="doAddGroup('all')">
           <template #icon-left>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14"/>
             </svg>
           </template>
           all
-          <template #icon-right>
-            <span @click.stop>
-              <FieldHelp>
-                <template #title>Все из списка</template>
-                Активируется только если все выполняются
-              </FieldHelp>
-            </span>
-          </template>
         </BaseButton>
         
-        <BaseButton variant="red" @click="doAddGroup('none')">
+        <BaseButton variant="red" title="Ни одно из списка: активируется если ни одно условие НЕ выполняется (NOT)" @click="doAddGroup('none')">
           <template #icon-left>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14"/>
             </svg>
           </template>
           none
-          <template #icon-right>
-            <span @click.stop>
-              <FieldHelp>
-                <template #title>Ни одно из списка</template>
-                Активируется если ни одно не выполняется
-              </FieldHelp>
-            </span>
-          </template>
         </BaseButton>
       </div>
     </div>

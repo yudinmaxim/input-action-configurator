@@ -68,4 +68,22 @@ button :deep(svg) {
 .icon-right :deep(svg) {
   margin-left: 0.5em;
 }
+
+.icon-right {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.25em;
+}
+
+.icon-right :deep(.help-wrapper) {
+  display: inline-flex;
+  align-items: center;
+}
+
+.icon-right :deep(.help-btn) {
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  margin-left: 0;
+}
 </style>

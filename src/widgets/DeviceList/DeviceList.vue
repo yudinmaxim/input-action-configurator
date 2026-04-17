@@ -59,8 +59,13 @@ const getDeviceLabel = (type: string) => {
 
 <template>
   <div>
-    <BaseTabs :model-value="selectedDevice" @update:model-value="handleTabChange">
+    <BaseTabs :model-value="selectedDevice ?? 'device-rules'" @update:model-value="handleTabChange">
       <template #default>
+        <BaseTab
+          id="device-rules"
+          label="Device Rules"
+          icon="⚙️"
+        />
         <BaseTab
           v-for="device in devices"
           :key="device.type"
