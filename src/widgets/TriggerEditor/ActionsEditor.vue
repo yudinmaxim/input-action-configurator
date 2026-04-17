@@ -84,17 +84,10 @@ function syncList() {
 
 watch(() => props.actions, syncList, { immediate: true, deep: true })
 
-// Сброс состояния режима мыши при изменении структуры списка действий
-// Временно отключен для отладки
-// watch(() => {
-//   // Создаем ключ, который меняется только при изменении структуры (количество действий и entries)
-//   return list.value.map(action => ({
-//     inputLength: action.input?.length || 0
-//   }))
-// }, () => {
-//   console.log('list structure changed, resetting mouseModeMap')
-//   mouseModeMap.value = {}
-// }, { deep: true })
+// Сброс состояния режима мыши не требуется, так как mouseModeMap привязан к индексам,
+// которые остаются валидными в пределах текущего списка действий.
+// При изменении структуры действий (добавлении/удалении) компонент перерисовывается,
+// и индексы обновляются.
 
 function getMouseMode(actionIndex: number, entryIndex: number): string {
   const key = `${actionIndex}-${entryIndex}`
