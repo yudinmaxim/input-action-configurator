@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useConfigStore } from '../../shared/lib/stores/config'
 import { DeviceRule } from '../../shared/lib/types'
 import { BaseInput, BaseSelect, BaseCheckbox, BaseButton } from '../../shared/ui/base'
@@ -7,14 +7,11 @@ import { getInputDevices, type InputDevice } from '../../shared/api/config'
 
 const store = useConfigStore()
 
-const rules = ref<DeviceRule[]>([])
 const editingIndex = ref<number | null>(null)
 const inputDevices = ref<InputDevice[]>([])
 const loadingDevices = ref(false)
 
-watch(() => store.deviceRules.value, (newRules) => {
-  rules.value = JSON.parse(JSON.stringify(newRules))
-}, { deep: true, immediate: true })
+const rules = computed(() => store.state.config.device_rules || [])
 
 const loadInputDevices = async () => {
   loadingDevices.value = true
@@ -32,8 +29,11 @@ const loadInputDevices = async () => {
   }
 }
 
-watch(() => store.state.selectedDevice, () => {
+watch(() => store.state.selectedDevice, (newDevice) => {
   loadInputDevices()
+  if (newDevice === 'device-rules' && rules.value.length > 0) {
+    editingIndex.value = 0
+  }
 }, { immediate: true })
 
 const devicesByCategory = computed(() => {
@@ -82,26 +82,32 @@ const DEVICE_PROPERTIES = [
 ]
 
 const addRule = () => {
-  rules.value.push({
+  if (!store.state.config.device_rules) {
+    store.state.config.device_rules = []
+  }
+  store.state.config.device_rules.push({
     conditions: [],
     ignore: false
   })
-  editingIndex.value = rules.value.length - 1
+  editingIndex.value = store.state.config.device_rules.length - 1
+  markDirty()
   loadInputDevices()
 }
 
 const removeRule = (index: number) => {
-  rules.value.splice(index, 1)
+  store.state.config.device_rules?.splice(index, 1)
   if (editingIndex.value === index) {
     editingIndex.value = null
   } else if (editingIndex.value !== null && editingIndex.value > index) {
     editingIndex.value--
   }
+  markDirty()
 }
 
 const selectDevice = (rule: DeviceRule, deviceName: string) => {
   if (!rule.conditions) rule.conditions = []
   ;(rule.conditions as any[]).push(`$name == ${deviceName}`)
+  markDirty()
 }
 
 const parseCondition = (raw: string): { var: string; op: string; value: string } => {
@@ -153,21 +159,25 @@ const setPropertyValue = (rule: DeviceRule, key: string, value: any) => {
   } else {
     (rule as any)[key] = value
   }
+  markDirty()
 }
 
 const addCondition = (rule: DeviceRule) => {
   if (!rule.conditions) rule.conditions = []
   ;(rule.conditions as any[]).push('$name == ')
+  markDirty()
 }
 
 const removeCondition = (rule: DeviceRule, index: number) => {
   rule.conditions?.splice(index, 1)
+  markDirty()
 }
 
 const updateConditionRaw = (rule: DeviceRule, index: number, raw: string) => {
   if (rule.conditions && rule.conditions[index] !== undefined) {
     ;(rule.conditions as any[])[index] = raw
   }
+  markDirty()
 }
 
 const getConditionsArray = (rule: DeviceRule): any[] => {
@@ -182,41 +192,14 @@ const needsValue = (condition: any): boolean => {
   return !['$keyboard', '$mouse', '$touchpad', '$touchscreen'].includes(parsed.var)
 }
 
-const saveAll = () => {
-  store.state.config.device_rules = [...rules.value]
+const markDirty = () => {
   store.state.isDirty = true
   store.saveToHistory()
-}
-
-const handleSave = async () => {
-  saveAll()
-  try {
-    await store.saveToFile()
-  } catch (e) {
-    console.error('Failed to save:', e)
-  }
 }
 </script>
 
 <template>
   <div class="h-full flex flex-col bg-gray-50">
-    <div class="p-4 border-b border-gray-200 bg-white">
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-lg font-semibold text-gray-800">Device Rules</h2>
-          <p class="text-sm text-gray-500 mt-1">Настройка правил для устройств ввода</p>
-        </div>
-        <div class="flex gap-2">
-          <BaseButton variant="secondary" @click="saveAll">
-            Применить
-          </BaseButton>
-          <BaseButton variant="green" @click="handleSave">
-            Сохранить
-          </BaseButton>
-        </div>
-      </div>
-    </div>
-
     <div class="flex-1 overflow-auto p-4">
       <div v-if="rules.length === 0" class="text-center py-12">
         <p class="text-gray-500">Нет правил для устройств</p>

@@ -38,10 +38,10 @@ const handleDelete = (event: Event) => {
 <template>
   <div class="tab-item-wrapper">
     <button
-      class="tab-item flex items-center gap-2 px-4 py-3 border-b-2 transition-colors whitespace-nowrap"
+      class="tab-item flex items-center gap-2 px-4 py-2 transition-colors whitespace-nowrap"
       :class="isActive() 
-        ? 'border-blue-500 text-blue-600 bg-blue-50' 
-        : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50'"
+        ? 'bg-blue-100 text-blue-700 font-medium ring-2 ring-blue-500 ring-offset-1' 
+        : 'text-gray-600 hover:text-gray-800'"
       @click="handleClick"
     >
       <span v-if="icon" class="text-lg">{{ icon }}</span>
@@ -68,12 +68,15 @@ const handleDelete = (event: Event) => {
 
 .tab-item {
   outline: none;
-  border-right: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   position: relative;
+  background: white;
+  transition: all 0.15s ease;
 }
 
-.tab-item:first-child {
-  border-left-radius: 8px;
+.tab-item:hover {
+  background: #f3f4f6;
 }
 
 .tab-item:focus-visible {
@@ -83,8 +86,8 @@ const handleDelete = (event: Event) => {
 }
 
 .delete-btn {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: none;
   background: transparent;

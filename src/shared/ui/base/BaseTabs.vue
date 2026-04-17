@@ -43,9 +43,9 @@ provide<(id: string) => void>('setActiveTab', setActiveTab)
 
 .tab-list {
   display: flex;
-  gap: 0;
-  border-bottom: 2px solid #e5e7eb;
-  background: white;
+  gap: 8px;
+  padding: 8px;
+  background: #f9fafb;
 }
 
 .tab-content {
