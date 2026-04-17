@@ -3,6 +3,7 @@ import { ref, watch, computed } from 'vue'
 import { useConfigStore } from '../../shared/lib/stores/config'
 import { DeviceRule } from '../../shared/lib/types'
 import { BaseInput, BaseSelect, BaseCheckbox, BaseButton } from '../../shared/ui/base'
+import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 import { getInputDevices, type InputDevice } from '../../shared/api/config'
 
 const store = useConfigStore()
@@ -68,17 +69,17 @@ const DEVICE_CONDITION_VARS = [
 ]
 
 const DEVICE_PROPERTIES = [
-  { key: 'ignore', label: 'Ignore (игнорировать)', type: 'boolean' },
-  { key: 'grab', label: 'Grab (перехват)', type: 'boolean' },
-  { key: 'buttonpad', label: 'Buttonpad', type: 'boolean' },
-  { key: 'handle_evdev_events', label: 'Handle Evdev Events', type: 'boolean' },
-  { key: 'motion_timeout', label: 'Motion Timeout (ms)', type: 'number' },
-  { key: 'motion_threshold', label: 'Motion Threshold', type: 'number' },
-  { key: 'motion_threshold_2', label: 'Motion Threshold 2', type: 'number' },
-  { key: 'motion_threshold_3', label: 'Motion Threshold 3', type: 'number' },
-  { key: 'press_timeout', label: 'Press Timeout (ms)', type: 'number' },
-  { key: 'click_timeout', label: 'Click Timeout (ms)', type: 'number' },
-  { key: 'unblock_buttons_on_timeout', label: 'Unblock Buttons on Timeout', type: 'boolean' },
+  { key: 'ignore', label: 'Ignore', description: 'Игнорировать устройство полностью (не обрабатывать события)', type: 'boolean' },
+  { key: 'grab', label: 'Grab', description: 'Перехватывать события устройства (эксклюзивный доступ)', type: 'boolean' },
+  { key: 'buttonpad', label: 'Buttonpad', description: 'Устройство является кнопочным тачпадом (без、物理ческих кнопок)', type: 'boolean' },
+  { key: 'handle_evdev_events', label: 'Handle Evdev Events', description: 'Обрабатывать сырые события evdev', type: 'boolean' },
+  { key: 'motion_timeout', label: 'Motion Timeout (ms)', description: 'Таймаут бездействия движения в миллисекундах', type: 'number' },
+  { key: 'motion_threshold', label: 'Motion Threshold', description: 'Порог движения для начала отслеживания', type: 'number' },
+  { key: 'motion_threshold_2', label: 'Motion Threshold 2', description: 'Вторичный порог движения (для многоуровневого отслеживания)', type: 'number' },
+  { key: 'motion_threshold_3', label: 'Motion Threshold 3', description: 'Третичный порог движения', type: 'number' },
+  { key: 'press_timeout', label: 'Press Timeout (ms)', description: 'Таймаут нажатия в миллисекундах (до определения жеста)', type: 'number' },
+  { key: 'click_timeout', label: 'Click Timeout (ms)', description: 'Таймаут между кликами для определения мульти-клика', type: 'number' },
+  { key: 'unblock_buttons_on_timeout', label: 'Unblock Buttons on Timeout', description: 'Разблокировать кнопки после таймаута', type: 'boolean' },
 ]
 
 const addRule = () => {
@@ -339,6 +340,10 @@ const markDirty = () => {
                     class="w-24"
                     @update:model-value="(v) => setPropertyValue(rule, prop.key, Number(v))"
                   />
+                  <FieldHelp>
+                    <template #title>{{ prop.label }}</template>
+                    {{ prop.description }}
+                  </FieldHelp>
                 </div>
               </div>
             </div>

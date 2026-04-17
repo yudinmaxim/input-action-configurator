@@ -11,6 +11,9 @@ const tooltipRef = ref<HTMLElement | null>(null)
 const timer = ref<number | null>(null)
 const tooltipPos = ref({ left: '0px', top: '0px' })
 
+const TOOLTIP_WIDTH = 240
+const TOOLTIP_OFFSET = 8
+
 const close = () => {
   timer.value = window.setTimeout(() => show.value = false, 150)
 }
@@ -25,9 +28,27 @@ const cancelClose = () => {
 const updateTooltipPos = () => {
   if (!btnRef.value) return
   const rect = btnRef.value.getBoundingClientRect()
+  const viewportWidth = window.innerWidth
+  const viewportHeight = window.innerHeight
+
+  let left = rect.right + TOOLTIP_OFFSET
+  let top = rect.top
+
+  if (left + TOOLTIP_WIDTH > viewportWidth - 10) {
+    left = rect.left - TOOLTIP_WIDTH - TOOLTIP_OFFSET
+  }
+
+  if (left < 10) {
+    left = 10
+  }
+
+  if (top + 100 > viewportHeight) {
+    top = Math.max(10, viewportHeight - 120)
+  }
+
   tooltipPos.value = {
-    left: `${rect.right + 8}px`,
-    top: `${rect.top}px`,
+    left: `${left}px`,
+    top: `${top}px`,
   }
 }
 
