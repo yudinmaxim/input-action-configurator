@@ -116,14 +116,6 @@ export const useGuiStore = () => {
   }
 
   const saveToFile = async (): Promise<ConfigResult> => {
-    // Update config file path before saving
-    try {
-      const currentConfigPath = await getConfigPath()
-      setConfigFilePath(currentConfigPath)
-    } catch (e) {
-      console.warn('Cannot get current config path:', e)
-    }
-
     if (!state.isDirty) {
       return { success: true, content: null, error: null }
     }

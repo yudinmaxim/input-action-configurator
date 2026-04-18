@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { BaseButton } from '../../shared/ui/base'
+import { BaseButton, BaseIconButton } from '../../shared/ui/base'
 import { 
   checkInstalled, 
   checkServiceRunning, 
@@ -145,11 +145,11 @@ const close = () => {
         <div class="bg-white rounded-lg shadow-xl w-[400px] overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h3 class="text-lg font-semibold text-gray-800">Выбрать приложение</h3>
-            <button class="close-btn" @click="close">
+            <BaseIconButton variant="close" @click="close">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
-            </button>
+            </BaseIconButton>
           </div>
           
           <div class="px-6 py-6 flex flex-col gap-4">
@@ -242,28 +242,5 @@ const close = () => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-}
-
-.close-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: #9ca3af;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-
-.close-btn:hover {
-  background: rgba(156, 163, 175, 0.3);
-  color: #4b5563;
-}
-
-.close-btn:active {
-  transform: scale(0.9);
 }
 </style>

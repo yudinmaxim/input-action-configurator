@@ -10,6 +10,7 @@ import DeviceRulesEditor from '../widgets/DeviceRulesEditor/DeviceRulesEditor.vu
 import { DeviceType } from '../shared/lib/stores/config'
 import BaseDropdown from '../shared/ui/base/BaseDropdown.vue'
 import BaseDropdownItem from '../shared/ui/base/BaseDropdownItem.vue'
+import BaseIconButton from '../shared/ui/base/BaseIconButton.vue'
 import BaseResizablePanel from '../shared/ui/base/BaseResizablePanel.vue'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { createConfigBackup } from '../shared/api/config'
@@ -294,14 +295,11 @@ onUnmounted(() => {
       <div class="flex items-center gap-2 shrink-0 ml-4">
         <BaseDropdown @select="confirmAddDevice">
           <template #trigger>
-            <button 
-              class="icon-btn"
-              title="Добавить устройство"
-            >
+            <BaseIconButton variant="icon" title="Добавить устройство">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
               </svg>
-            </button>
+            </BaseIconButton>
           </template>
           <template #default>
             <BaseDropdownItem 
@@ -316,19 +314,16 @@ onUnmounted(() => {
           </template>
         </BaseDropdown>
 
-        <button 
-          class="icon-btn"
-          title="Показать конфиг"
-          @click="showConfigPreview = true"
-        >
+        <BaseIconButton variant="icon" title="Показать конфиг" @click="showConfigPreview = true">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
           </svg>
-        </button>
+        </BaseIconButton>
 
-        <button 
-          class="icon-btn ml-4"
+        <BaseIconButton 
+          variant="icon" 
+          class="ml-4"
           title="Отменить (Ctrl+Z)"
           :disabled="!canUndo"
           @click="store.undo()"
@@ -336,9 +331,9 @@ onUnmounted(() => {
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
           </svg>
-        </button>
-        <button 
-          class="icon-btn"
+        </BaseIconButton>
+        <BaseIconButton 
+          variant="icon"
           title="Вернуть (Ctrl+Y)"
           :disabled="!canRedo"
           @click="store.redo()"
@@ -346,46 +341,46 @@ onUnmounted(() => {
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"/>
           </svg>
-        </button>
+        </BaseIconButton>
         
-        <button 
-          class="icon-btn"
+        <BaseIconButton 
+          variant="icon"
           title="Сохранить"
           @click="handleSave"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
           </svg>
-        </button>
+        </BaseIconButton>
         
-        <div class="flex border-l border-gray-300 pl-2 ml-2 window-controls">
-          <button 
-            class="control-btn minimize"
+        <div class="flex border-l border-gray-300 pl-2 ml-2" style="-webkit-app-region: no-drag; app-region: no-drag;">
+          <BaseIconButton
+            class="hover:bg-gray-100"
             @click="handleMinimize"
             title="Minimize"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
             </svg>
-          </button>
-          <button 
-            class="control-btn maximize"
+          </BaseIconButton>
+          <BaseIconButton
+            class="hover:bg-gray-100"
             @click="handleMaximize"
             title="Maximize"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
             </svg>
-          </button>
-          <button 
-            class="control-btn close"
+          </BaseIconButton>
+          <BaseIconButton
+            class="hover:bg-red-400"
             @click="handleClose"
             title="Close"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
-          </button>
+          </BaseIconButton>
         </div>
       </div>
     </header>
@@ -446,71 +441,5 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-}
-
-.titlebar {
-  height: 40px;
-  cursor: default;
-}
-
-.drag-content {
-  flex: 1;
-}
-
-.window-controls {
-  -webkit-app-region: no-drag;
-  app-region: no-drag;
-}
-
-.control-btn {
-  width: 46px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.control-btn:hover {
-  background-color: #f3f4f6;
-}
-
-.control-btn.close:hover {
-  background-color: #ef4444;
-}
-
-.control-btn.close:hover svg {
-  color: white;
-}
-
-.icon-btn {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 6px;
-  background: #f3f4f6;
-  color: #374151;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.icon-btn:hover:not(:disabled) {
-  background: #e5e7eb;
-}
-
-.icon-btn:active:not(:disabled) {
-  transform: scale(0.95);
-}
-
-.icon-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  color: #9ca3af;
 }
 </style>

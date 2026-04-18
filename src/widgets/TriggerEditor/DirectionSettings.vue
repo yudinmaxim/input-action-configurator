@@ -22,6 +22,7 @@ const emit = defineEmits<{
         :model-value="selectedTrigger.direction"
         :options="SwipeDirectionOptions"
         label="Direction"
+        expanded
         @update:model-value="emit('update-field', 'direction', $event)"
       />
       <BaseSelect
@@ -29,6 +30,7 @@ const emit = defineEmits<{
         :model-value="selectedTrigger.direction"
         :options="CircleDirectionOptions"
         label="Direction"
+        expanded
         @update:model-value="emit('update-field', 'direction', $event)"
       />
       <BaseSelect
@@ -36,6 +38,7 @@ const emit = defineEmits<{
         :model-value="selectedTrigger.fingers || 1"
         :options="[{value:1, label:'1 finger'},{value:2, label:'2 fingers'},{value:3, label:'3 fingers'},{value:4, label:'4 fingers'}]"
         label="Fingers"
+        expanded
         @update:model-value="emit('update-field', 'fingers', Number($event))"
       />
       <BaseSelect
@@ -44,6 +47,7 @@ const emit = defineEmits<{
         :options="MouseButtonOptions"
         label="Mouse Button"
         placeholder="Any"
+        expanded
         @update:model-value="emit('update-field', 'mouse_buttons', $event ? [$event] : undefined)"
       />
       <BaseCheckbox

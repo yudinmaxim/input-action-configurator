@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { inject, type Ref } from 'vue'
+import BaseIconButton from './BaseIconButton.vue'
 
 interface IProps {
   id: string
@@ -36,77 +37,31 @@ const handleDelete = (event: Event) => {
 </script>
 
 <template>
-  <div class="tab-item-wrapper">
+  <div class="inline-block">
     <button
-      class="tab-item flex items-center gap-2 px-4 py-2 transition-colors whitespace-nowrap"
+      class="flex items-center gap-2 px-4 py-2 transition-colors whitespace-nowrap outline-none border rounded-lg relative bg-white"
       :class="isActive() 
         ? 'bg-blue-100 text-blue-700 font-medium ring-2 ring-blue-500 ring-offset-1' 
-        : 'text-gray-600 hover:text-gray-800'"
+        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'"
       @click="handleClick"
     >
       <span v-if="icon" class="text-lg">{{ icon }}</span>
       <span class="font-medium">{{ label }}</span>
       <slot name="badge" />
-      <button
+      <BaseIconButton 
         v-if="deletable"
-        class="delete-btn"
+        variant="delete"
+        class="ml-1"
         @click="handleDelete"
         title="Delete tab"
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-      </button>
+      </BaseIconButton>
     </button>
   </div>
 </template>
 
 <style scoped>
-.tab-item-wrapper {
-  display: inline-block;
-}
-
-.tab-item {
-  outline: none;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  position: relative;
-  background: white;
-  transition: all 0.15s ease;
-}
-
-.tab-item:hover {
-  background: #f3f4f6;
-}
-
-.tab-item:focus-visible {
-  ring: 2px;
-  ring-offset: 2px;
-  ring-color: blue;
-}
-
-.delete-btn {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: #9ca3af;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-  padding: 0;
-  margin-left: 4px;
-}
-
-.delete-btn:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.delete-btn:active {
-  transform: scale(0.9);
-}
 </style>

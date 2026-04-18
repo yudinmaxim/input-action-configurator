@@ -67,26 +67,4 @@ const emit = defineEmits<{
 </template>
 
 <style scoped>
-.delete-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: #9ca3af;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-
-.delete-btn:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.delete-btn:active {
-  transform: scale(0.9);
-}
 </style>

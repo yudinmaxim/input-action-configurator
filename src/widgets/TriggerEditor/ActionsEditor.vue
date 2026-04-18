@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { BaseInput, BaseSelect } from '../../shared/ui/base'
+import { BaseInput, BaseSelect, BaseButton } from '../../shared/ui/base'
+import BaseIconButton from '../../shared/ui/base/BaseIconButton.vue'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
 import MouseButtonsSelector from '../../shared/ui/base/MouseButtonsSelector.vue'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
@@ -449,11 +450,11 @@ Special (for update/tick):
           <span class="text-sm font-semibold" :class="EVENT_COLORS_TEXT[action.on] || 'text-gray-600'">
             {{ EVENT_LABELS[action.on] || action.on }}
           </span>
-          <button class="delete-btn" @click="remove(actionIndex)">
+          <BaseIconButton variant="delete" @click="remove(actionIndex)">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-          </button>
+          </BaseIconButton>
         </div>
         
         <!-- Тип экшена -->
@@ -534,14 +535,11 @@ Special (for update/tick):
                     />
                   </template>
                 </div>
-                <button 
-                  class="delete-btn"
-                  @click="removeInputEntry(actionIndex, entryIndex)"
-                >
+                <BaseIconButton variant="delete" @click="removeInputEntry(actionIndex, entryIndex)">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
-                </button>
+                </BaseIconButton>
               </div>
               
               <!-- Keyboard -->
@@ -667,15 +665,17 @@ Special (for update/tick):
                       </button>
                     </div>
                     
-                    <button 
-                      class="add-small-btn"
+                    <BaseButton 
+                      variant="ghost"
+                      size="sm"
+                      class="btn-add-gray"
                       @click="() => {
                         const actions = [...(entry.mouse || []), '+left']
                         updateMouseActions(actionIndex, entryIndex, actions)
                       }"
                     >
                       + action
-                    </button>
+                    </BaseButton>
                   </template>
                 </div>
               </template>
@@ -683,18 +683,12 @@ Special (for update/tick):
             
             <!-- Add input entry -->
             <div class="flex gap-2">
-              <button 
-                class="add-small-btn"
-                @click="addInputEntry(actionIndex, 'keyboard')"
-              >
+              <BaseButton variant="ghost" size="sm" class="btn-add-gray" @click="addInputEntry(actionIndex, 'keyboard')">
                 + ⌨️ Keyboard
-              </button>
-              <button 
-                class="add-small-btn"
-                @click="addInputEntry(actionIndex, 'mouse')"
-              >
+              </BaseButton>
+              <BaseButton variant="ghost" size="sm" class="btn-add-gray" @click="addInputEntry(actionIndex, 'mouse')">
                 + 🖱️ Mouse
-              </button>
+              </BaseButton>
             </div>
           </div>
         </template>
@@ -740,15 +734,21 @@ Special (for update/tick):
         <button 
           v-for="event in ['begin', 'update', 'end', 'cancel', 'end_cancel']"
           :key="event"
-          class="add-btn"
-          :class="getAddBtnClass(event)"
+          class="btn-add"
+          :class="{
+            'btn-add-blue': event === 'begin',
+            'btn-add-green': event === 'update',
+            'btn-add-purple': event === 'end',
+            'btn-add-red': event === 'cancel',
+            'btn-add-orange': event === 'end_cancel',
+          }"
           @click="addAction(event)"
         >
           + {{ EVENT_LABELS[event] }}
         </button>
         
         <button 
-          class="add-btn add-btn-gray"
+          class="btn-add btn-add-gray"
           @click="addAction('tick')"
         >
           + {{ EVENT_LABELS['tick'] }}
@@ -759,30 +759,7 @@ Special (for update/tick):
 </template>
 
 <style scoped>
-.delete-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: #9ca3af;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-
-.delete-btn:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.delete-btn:active {
-  transform: scale(0.9);
-}
-
-.add-btn {
+.btn-add {
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 14px;
@@ -792,83 +769,7 @@ Special (for update/tick):
   transition: all 0.15s ease;
 }
 
-.add-btn:active {
-  transform: scale(0.95);
-}
-
-.add-btn-blue {
-  background: #dbeafe;
-  color: #2563eb;
-}
-.add-btn-blue:hover {
-  background: #bfdbfe;
-}
-
-.add-btn-green {
-  background: #dcfce7;
-  color: #16a34a;
-}
-.add-btn-green:hover {
-  background: #bbf7d0;
-}
-
-.add-btn-amber {
-  background: #fef3c7;
-  color: #d97706;
-}
-.add-btn-amber:hover {
-  background: #fde68a;
-}
-
-.add-btn-red {
-  background: #fee2e2;
-  color: #dc2626;
-}
-.add-btn-red:hover {
-  background: #fecaca;
-}
-
-.add-btn-purple {
-  background: #f3e8ff;
-  color: #9333ea;
-}
-.add-btn-purple:hover {
-  background: #e9d5ff;
-}
-
-.add-btn-orange {
-  background: #ffedd5;
-  color: #ea580c;
-}
-.add-btn-orange:hover {
-  background: #fed7aa;
-}
-
-.add-btn-gray {
-  background: #f3f4f6;
-  color: #4b5563;
-}
-.add-btn-gray:hover {
-  background: #e5e7eb;
-}
-
-.add-small-btn {
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  border: none;
-  background: #f3f4f6;
-  color: #4b5563;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.add-small-btn:hover {
-  background: #e5e7eb;
-}
-
-.add-small-btn:active {
+.btn-add:active {
   transform: scale(0.95);
 }
 </style>

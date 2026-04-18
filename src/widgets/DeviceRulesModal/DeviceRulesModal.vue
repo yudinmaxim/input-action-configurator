@@ -2,7 +2,7 @@
 import { ref, watch, computed } from 'vue'
 import { useConfigStore } from '../../shared/lib/stores/config'
 import { DeviceRule } from '../../shared/lib/types'
-import { BaseInput, BaseSelect, BaseCheckbox, BaseButton } from '../../shared/ui/base'
+import { BaseInput, BaseSelect, BaseCheckbox, BaseButton, BaseIconButton } from '../../shared/ui/base'
 import { getInputDevices, type InputDevice } from '../../shared/api/config'
 
 const props = withDefaults(defineProps<{
@@ -262,11 +262,11 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                 {{ rules.length }} правил
               </span>
             </div>
-            <button class="delete-btn" @click="close">
+            <BaseIconButton variant="close" @click="close">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
-            </button>
+            </BaseIconButton>
           </div>
           
           <div class="flex-1 overflow-auto p-4">
@@ -301,11 +301,11 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                     >
                       {{ rule.ignore ? 'ignore' : 'active' }}
                     </span>
-                    <button class="delete-btn" @click.stop="removeRule(index)">
+                    <BaseIconButton variant="delete" @click.stop="removeRule(index)">
                       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                         <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
-                    </button>
+                    </BaseIconButton>
                     <svg 
                       width="16" height="16" viewBox="0 0 16 16" fill="none" 
                       class="text-gray-500 transition-transform"
@@ -397,11 +397,11 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                         <template v-else>
                           <span class="text-gray-500 text-sm italic">(boolean flag)</span>
                         </template>
-                        <button class="delete-btn" @click="removeCondition(rule, condIndex)">
+                        <BaseIconButton variant="delete" @click="removeCondition(rule, condIndex)">
                           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                             <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
                           </svg>
-                        </button>
+                        </BaseIconButton>
                       </div>
                     </div>
                     <p v-else class="text-xs text-gray-500 italic">
@@ -466,29 +466,5 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
-}
-
-.delete-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: #9ca3af;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-}
-
-.delete-btn:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.delete-btn:active {
-  transform: scale(0.9);
 }
 </style>

@@ -3,6 +3,7 @@ import { ref, watch, computed } from 'vue'
 import { useConfigStore } from '../../shared/lib/stores/config'
 import { DeviceRule } from '../../shared/lib/types'
 import { BaseInput, BaseSelect, BaseCheckbox, BaseButton } from '../../shared/ui/base'
+import BaseIconButton from '../../shared/ui/base/BaseIconButton.vue'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 import { getInputDevices, type InputDevice } from '../../shared/api/config'
 
@@ -366,27 +367,4 @@ const markDirty = () => {
 </template>
 
 <style scoped>
-.delete-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: #9ca3af;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-}
-
-.delete-btn:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.delete-btn:active {
-  transform: scale(0.9);
-}
 </style>

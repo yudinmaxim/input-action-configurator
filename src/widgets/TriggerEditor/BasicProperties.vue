@@ -19,6 +19,7 @@ const emit = defineEmits<{
     <div class="grid grid-cols-2 gap-4">
       <BaseInput
         :model-value="selectedTrigger.id || ''"
+        expanded
         label="ID"
         @blur="emit('update-field', 'id', $event)"
       >
@@ -30,12 +31,14 @@ const emit = defineEmits<{
       </BaseInput>
       <BaseSelect
         :model-value="selectedTrigger.type"
+        expanded
         :options="[{value: selectedTrigger.type, label: selectedTrigger.type}]"
         label="Type"
         disabled
       />
       <BaseInput
         :model-value="selectedTrigger.threshold as string || ''"
+        expanded
         label="Threshold"
         placeholder="optional"
         @update:model-value="emit('update-field', 'threshold', $event)"
@@ -50,6 +53,7 @@ const emit = defineEmits<{
       </BaseInput>
       <BaseSelect
         :model-value="selectedTrigger.speed as string || ''"
+        expanded
         :options="[{value:'', label:'Default'},{value:'fast', label:'Fast'},{value:'slow', label:'Slow'}]"
         label="Speed"
         @update:model-value="emit('update-field', 'speed', $event || undefined)"

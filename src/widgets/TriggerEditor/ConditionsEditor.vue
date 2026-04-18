@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { BaseInput, BaseSelect, BaseButton } from '../../shared/ui/base'
+import { BaseInput, BaseSelect, BaseButton, BaseIconButton } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 import ConditionGroup from '../../shared/ui/base/ConditionGroup.vue'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
@@ -385,12 +385,12 @@ any: [$window_class==firefox, $window_class==chrome]
                 <template #title>{{ getConditionTitle(getRootType(c)) }}</template>
                 {{ getConditionDescription(getRootType(c)) }}
               </FieldHelp>
-            </div>
-            <button class="delete-btn" @click="remove(i)">
+</div>
+            <BaseIconButton variant="delete" @click="remove(i)">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-            </button>
+            </BaseIconButton>
           </div>
           <div class="flex items-end gap-2">
             <BaseSelect
@@ -414,22 +414,17 @@ any: [$window_class==firefox, $window_class==chrome]
               class="flex-1"
               @update:model-value="(v) => onVal(i, v)"
             />
-            <button 
+            <BaseIconButton 
               v-if="WINDOW_VARIABLES.includes(getSimple(c).variable)"
-              class="app-btn"
+              variant="app-select"
               title="Кликните, затем переключитесь на нужное окно. После клика у вас будет 3 секунды на активацию нужного приложения."
               @click="startCountdown(i)"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="2" y="3" width="20" height="14" rx="2"/>
-                <path d="M8 21h8M12 17v4"/>
+<path d="M8 21h8M12 17v4"/>
               </svg>
-            </button>
-            <button class="delete-btn" @click="remove(i)">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
+            </BaseIconButton>
           </div>
         </div>
       </div>
@@ -496,99 +491,6 @@ any: [$window_class==firefox, $window_class==chrome]
 </template>
 
 <style scoped>
-.delete-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: #9ca3af;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-
-.delete-btn:hover {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-}
-
-.delete-btn:active {
-  transform: scale(0.9);
-}
-
-.add-btn {
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  transition: all 0.15s ease;
-}
-
-.add-btn:active {
-  transform: scale(0.95);
-}
-
-.add-btn-blue {
-  background: #dbeafe;
-  color: #2563eb;
-}
-.add-btn-blue:hover {
-  background: #bfdbfe;
-}
-
-.add-btn-green {
-  background: #dcfce7;
-  color: #16a34a;
-}
-.add-btn-green:hover {
-  background: #bbf7d0;
-}
-
-.add-btn-amber {
-  background: #fef3c7;
-  color: #d97706;
-}
-.add-btn-amber:hover {
-  background: #fde68a;
-}
-
-.add-btn-red {
-  background: #fee2e2;
-  color: #dc2626;
-}
-.add-btn-red:hover {
-  background: #fecaca;
-}
-
-.app-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: none;
-  background: #e5e7eb;
-  color: #6b7280;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-
-.app-btn:hover {
-  background: #d1d5db;
-}
-
-.app-btn:active {
-  transform: scale(0.9);
-}
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;

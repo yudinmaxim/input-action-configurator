@@ -10,10 +10,12 @@ https://wiki.inputactions.org/v0.9.0/example-triggers.html
 
 ```bash
 npm run dev          # Frontend dev server (port 1420)
-npm run type-check   # TypeScript validation
+npm run type-check   # TypeScript validation (vue-tsc --noEmit)
+npm run test         # Run tests (vitest run)
+npm run test:watch   # Run tests in watch mode
 npm run build        # Frontend production build
 npm run tauri:dev    # Desktop app (Tauri)
-npm run tauri:build # Desktop production build
+npm run tauri:build  # Desktop production build
 ```
 
 ## Important Notes
@@ -21,7 +23,8 @@ npm run tauri:build # Desktop production build
 - **Entry point:** `src/main.ts` (not main.js)
 - **Config location:** `~/.config/inputactions/config.yaml`
 - **Reactivity quirk:** When switching triggers in list, use `:key` on TriggerEditor container to force re-render (known Vue reactivity issue with nested objects)
-- **Type checking:** Uses `vue-tsc --noEmit` (not tsc directly)
+- **Type checking:** `npm run type-check` uses `vue-tsc --noEmit` (not tsc directly)
+- **No ESLint** - this repo has no linting configured
 
 ## Tech Stack
 

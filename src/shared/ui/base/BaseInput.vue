@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 interface IProps {
   modelValue?: string | number
   type?: string
@@ -6,6 +8,7 @@ interface IProps {
   label?: string
   error?: string
   disabled?: boolean
+  expanded?: boolean
 }
 
 const {
@@ -14,30 +17,33 @@ const {
   placeholder = '',
   label = '',
   error = '',
-  disabled = false
+  disabled = false,
+  expanded = false
 } = defineProps<IProps>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
   'blur': [value: string]
 }>()
+
+const widthClass = computed(() => expanded ? 'w-full' : 'w-fit')
 </script>
 
 <template>
-  <div class="flex flex-col gap-1">
+  <div class="flex flex-col gap-1" :class="widthClass">
     <label v-if="label" class="text-sm font-medium text-gray-700 flex items-center gap-1">
       {{ label }}
       <slot name="label-before" />
     </label>
-    <div class="relative flex">
+    <div class="relative flex" :class="widthClass">
       <input
         :type="type"
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
-        class="px-3 py-2 border rounded-md text-base text-gray-800 bg-white transition-colors outline-none w-full"
+        class="w-full px-3 py-2 border rounded-md text-base text-gray-800 bg-white transition-colors outline-none hover:border-gray-400 "
         :class="[
-          error ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500',
+          error ? 'border-red-500 focus:border-red-500' : 'border-gray-300',
           disabled && 'bg-gray-50 cursor-not-allowed opacity-50'
         ]"
         @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
