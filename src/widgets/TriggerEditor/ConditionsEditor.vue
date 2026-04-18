@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { BaseInput, BaseSelect, BaseButton, BaseIconButton } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 import ConditionGroup from '../../shared/ui/base/ConditionGroup.vue'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
 import { getActiveWindow } from '../../entities/window-detector'
+
+const { t: $t } = useI18n()
 
 interface GroupCondition {
   groupType: 'any' | 'all' | 'none'
@@ -417,7 +420,7 @@ any: [$window_class==firefox, $window_class==chrome]
             <BaseIconButton 
               v-if="WINDOW_VARIABLES.includes(getSimple(c).variable)"
               variant="app-select"
-              title="Кликните, затем переключитесь на нужное окно. После клика у вас будет 3 секунды на активацию нужного приложения."
+              :title="$t('conditionGroup.pickWindow')"
               @click="startCountdown(i)"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -430,7 +433,7 @@ any: [$window_class==firefox, $window_class==chrome]
       </div>
       
       <div class="flex flex-wrap gap-2">
-        <BaseButton variant="blue" title="Простое условие: проверяет $переменная == значение" @click="doAddSimple">
+        <BaseButton variant="blue" :title="$t('conditions.simple')" @click="doAddSimple">
           <template #icon-left>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14"/>
@@ -439,7 +442,7 @@ any: [$window_class==firefox, $window_class==chrome]
           condition
         </BaseButton>
         
-        <BaseButton variant="green" title="Любое из списка: активируется если хотя бы одно условие выполняется (OR)" @click="doAddGroup('any')">
+        <BaseButton variant="green" :title="$t('conditions.any')" @click="doAddGroup('any')">
           <template #icon-left>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14"/>
@@ -448,7 +451,7 @@ any: [$window_class==firefox, $window_class==chrome]
           any
         </BaseButton>
         
-        <BaseButton variant="amber" title="Все из списка: активируется только если все условия выполняются (AND)" @click="doAddGroup('all')">
+        <BaseButton variant="amber" :title="$t('conditions.all')" @click="doAddGroup('all')">
           <template #icon-left>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14"/>
@@ -457,7 +460,7 @@ any: [$window_class==firefox, $window_class==chrome]
           all
         </BaseButton>
         
-        <BaseButton variant="red" title="Ни одно из списка: активируется если ни одно условие НЕ выполняется (NOT)" @click="doAddGroup('none')">
+        <BaseButton variant="red" :title="$t('conditions.none')" @click="doAddGroup('none')">
           <template #icon-left>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 5v14M5 12h14"/>

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t: $t } = useI18n()
 import { useConfigStore } from '../shared/lib/stores/config'
 import { useGuiStore } from '../shared/lib/stores/gui'
 import { DeviceList } from '../widgets/DeviceList'
@@ -295,7 +298,7 @@ onUnmounted(() => {
       <div class="flex items-center gap-2 shrink-0 ml-4">
         <BaseDropdown @select="confirmAddDevice">
           <template #trigger>
-            <BaseIconButton variant="icon" title="Добавить устройство">
+            <BaseIconButton variant="icon" :title="$t('app.addDevice')">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
               </svg>
@@ -314,7 +317,7 @@ onUnmounted(() => {
           </template>
         </BaseDropdown>
 
-        <BaseIconButton variant="icon" title="Показать конфиг" @click="showConfigPreview = true">
+        <BaseIconButton variant="icon" :title="$t('app.showConfig')" @click="showConfigPreview = true">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -324,7 +327,7 @@ onUnmounted(() => {
         <BaseIconButton 
           variant="icon" 
           class="ml-4"
-          title="Отменить (Ctrl+Z)"
+          :title="$t('app.undo')"
           :disabled="!canUndo"
           @click="store.undo()"
         >
@@ -334,7 +337,7 @@ onUnmounted(() => {
         </BaseIconButton>
         <BaseIconButton 
           variant="icon"
-          title="Вернуть (Ctrl+Y)"
+          :title="$t('app.redo')"
           :disabled="!canRedo"
           @click="store.redo()"
         >
@@ -345,7 +348,7 @@ onUnmounted(() => {
         
         <BaseIconButton 
           variant="icon"
-          title="Сохранить"
+          :title="$t('common.save')"
           @click="handleSave"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

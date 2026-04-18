@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useConfigStore } from '../../shared/lib/stores/config'
 import { DeviceRule } from '../../shared/lib/types'
 import { BaseInput, BaseSelect, BaseCheckbox, BaseButton, BaseIconButton } from '../../shared/ui/base'
 import { getInputDevices, type InputDevice } from '../../shared/api/config'
+
+const { t: $t } = useI18n()
 
 const props = withDefaults(defineProps<{
   modelValue: boolean
@@ -271,8 +274,8 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
           
           <div class="flex-1 overflow-auto p-4">
             <div v-if="rules.length === 0" class="text-center py-12 text-gray-400">
-              <p>Нет правил для устройств</p>
-              <p class="text-sm mt-1">Нажмите "Добавить правило" чтобы создать первое</p>
+              <p>{{ $t('device.noRules') }}</p>
+              <p class="text-sm mt-1">{{ $t('device.createFirst') }}</p>
             </div>
             
             <div v-else class="flex flex-col gap-4">

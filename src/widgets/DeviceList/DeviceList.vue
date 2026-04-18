@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useConfigStore } from '../../shared/lib/stores/config'
 import { BaseTabs, BaseTab, BaseModal } from '../../shared/ui/base'
 import { DeviceType } from '../../shared/lib/types'
+
+const { t: $t } = useI18n()
 
 defineProps<{
   selectedDevice: string | null
@@ -47,13 +50,7 @@ const getDeviceIcon = (type: string) => {
 }
 
 const getDeviceLabel = (type: string) => {
-  const labels: Record<string, string> = {
-    keyboard: 'Keyboard',
-    mouse: 'Mouse',
-    touchpad: 'Touchpad',
-    touchscreen: 'Touchscreen'
-  }
-  return labels[type] || type
+  return type === 'device-rules' ? $t('deviceLabels.deviceRules') : $t(`deviceLabels.${type}`)
 }
 </script>
 
@@ -89,10 +86,10 @@ const getDeviceLabel = (type: string) => {
 
     <BaseModal
       v-model="showDeleteModal"
-      title="Удалить устройство"
+      :title="$t('device.delete')"
       :message="`Вы уверены, что хотите удалить устройство '${getDeviceLabel(deletingDevice || '')}' и все его триггеры? Это действие нельзя отменить.`"
-      confirm-text="Удалить"
-      cancel-text="Отмена"
+      :confirm-text="$t('common.delete')"
+      :cancel-text="$t('common.cancel')"
       confirm-variant="danger"
       @confirm="confirmDelete"
     />

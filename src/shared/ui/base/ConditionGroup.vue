@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { BaseSelect, BaseInput, BaseButton, BaseIconButton } from './index'
 import FieldHelp from './FieldHelp.vue'
 import KeyboardModifierToggles from '../../../widgets/TriggerEditor/KeyboardModifierToggles.vue'
+
+const { t: $t } = useI18n()
 
 interface SimpleCondition {
   variable: string
@@ -167,7 +170,7 @@ const getModifiers = (condition: SimpleCondition): string[] => {
           />
           <BaseIconButton 
             variant="app-select"
-            title="Кликните, затем переключитесь на нужное окно. После клика у вас будет 3 секунды на активацию нужного приложения."
+            :title="$t('conditionGroup.pickWindow')"
             @click="emit('pickWindow', index)"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

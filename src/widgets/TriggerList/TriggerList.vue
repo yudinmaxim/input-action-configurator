@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useConfigStore } from '../../shared/lib/stores/config'
 import NewTriggerForm from './NewTriggerForm.vue'
 import TriggerCard from './TriggerCard.vue'
+
+const { t: $t } = useI18n()
 
 const props = defineProps<{
   selectedDevice: string | null
@@ -33,7 +36,7 @@ const selectedTriggerTriggers = computed(() => {
       <button 
         v-if="selectedDevice"
         class="icon-btn"
-        title="Добавить триггер"
+        :title="$t('trigger.add')"
         @click="showNewTriggerForm = true"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

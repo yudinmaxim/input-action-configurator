@@ -1,0 +1,68 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm"
+  },
+  "app": {
+    "addDevice": "Add Device",
+    "showConfig": "Show Config",
+    "undo": "Undo (Ctrl+Z)",
+    "redo": "Redo (Ctrl+Y)"
+  },
+  "device": {
+    "add": "Add Device",
+    "delete": "Delete Device",
+    "rules": "Device Rules",
+    "noRules": "No device rules",
+    "addRule": "Add Rule",
+    "createFirst": "Press \"Add Rule\" to create the first one",
+    "selectDevice": "Select device:"
+  },
+  "trigger": {
+    "add": "Add Trigger",
+    "duplicate": "Duplicate",
+    "delete": "Delete"
+  },
+  "conditions": {
+    "any": "Any: activates if at least one condition is met (OR)",
+    "all": "All: activates only if all conditions are met (AND)",
+    "none": "None: activates if NO conditions are met (NOT)",
+    "simple": "Simple: checks $variable == value",
+    "value": "value"
+  },
+  "conditionGroup": {
+    "any": "Any of the list",
+    "all": "All of the list",
+    "none": "None of the list",
+    "pickWindow": "Click, then switch to the desired window. After clicking, you have 3 seconds to activate the desired application.",
+    "windowCondition": "Window condition"
+  },
+  "inputAction": {
+    "keyboard": "Keyboard",
+    "mouse": "Mouse",
+    "selectKeys": "select keys",
+    "key": "key",
+    "button": "button",
+    "multiplier": "multiplier",
+    "text": "text to type"
+  },
+  "windowPicker": {
+    "select": "Select Application",
+    "pickWindow": "Select Window",
+    "install": "Install"
+  },
+  "form": {
+    "value": "value"
+  },
+  "deviceLabels": {
+    "keyboard": "Keyboard",
+    "mouse": "Mouse",
+    "touchpad": "Touchpad",
+    "touchscreen": "Touchscreen",
+    "deviceRules": "Device Rules"
+  }
+}

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useConfigStore } from '../../shared/lib/stores/config'
 import { DeviceRule } from '../../shared/lib/types'
 import { BaseInput, BaseSelect, BaseCheckbox, BaseButton } from '../../shared/ui/base'
-import BaseIconButton from '../../shared/ui/base/BaseIconButton.vue'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 import { getInputDevices, type InputDevice } from '../../shared/api/config'
+
+const { t: $t } = useI18n()
 
 const store = useConfigStore()
 
@@ -205,7 +207,7 @@ const markDirty = () => {
     <div class="flex-1 overflow-auto p-4">
       <div v-if="rules.length === 0" class="text-center py-12">
         <p class="text-gray-500">Нет правил для устройств</p>
-        <p class="text-sm text-gray-400 mt-1">Нажмите "Добавить правило" чтобы создать первое</p>
+        <p class="text-sm text-gray-400 mt-1">{{ $t('device.createFirst') }}</p>
       </div>
       
       <div v-else class="flex flex-col gap-4">
@@ -360,7 +362,7 @@ const markDirty = () => {
               <path d="M12 5v14M5 12h14"/>
             </svg>
           </template>
-          Добавить правило
+          {{ $t('device.addRule') }}
         </BaseButton>
       </div>
     </div>
