@@ -291,6 +291,7 @@ const markDirty = () => {
                       :model-value="parseCondition(String(cond)).value"
                       placeholder="значение"
                       class="flex-1"
+                      expanded
                       @update:model-value="(v) => {
                         const parsed = parseCondition(String(cond))
                         parsed.value = v as string

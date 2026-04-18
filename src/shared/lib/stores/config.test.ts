@@ -330,10 +330,10 @@ describe('useConfigStore', () => {
   })
 
   describe('deleteDevice', () => {
-    it('должен очищать все триггеры устройства', () => {
+    it('должен удалять устройство из конфига', () => {
       store.deleteDevice(DeviceType.TOUCHPAD)
       
-      expect(store.state.config.device?.touchpad).toHaveLength(0)
+      expect(store.state.config.device?.touchpad).toBeUndefined()
       expect(store.state.isDirty).toBe(true)
     })
 

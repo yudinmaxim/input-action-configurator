@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide, ref, type Ref } from 'vue'
+import { provide, ref, watch, type Ref } from 'vue'
 
 interface IProps {
   modelValue?: string
@@ -14,6 +14,10 @@ const emit = defineEmits<{
 }>()
 
 const activeTab = ref<string>(props.modelValue)
+
+watch(() => props.modelValue, (newVal) => {
+  activeTab.value = newVal
+})
 
 const setActiveTab = (tabId: string) => {
   activeTab.value = tabId

@@ -252,7 +252,7 @@ export const useConfigStore = () => {
   
   const deleteDevice = (deviceType: DeviceType) => {
     if (state.config.device?.[deviceType]) {
-      state.config.device[deviceType] = []
+      delete state.config.device[deviceType]
       state.isDirty = true
       saveToHistory()
     }
