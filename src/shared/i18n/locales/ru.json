@@ -99,7 +99,8 @@
     "acceleratedDelta": "Ускоренное delta",
     "setLastTrigger": "Установить последний триггер",
     "options": "Опции",
-    "triggerEditor": "Редактор триггеров"
+    "triggerEditor": "Редактор триггеров",
+    "deleteTab": "Удалить вкладку"
   },
   "deviceLabels": {
     "keyboard": "Keyboard",

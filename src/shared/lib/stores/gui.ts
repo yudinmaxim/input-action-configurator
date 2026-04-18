@@ -10,6 +10,7 @@ export interface GuiSettings {
   showConfigPreview: boolean
   enableBackups: boolean
   backupCount: number
+  language: string
   windowState?: {
     width: number
     height: number
@@ -28,6 +29,7 @@ const defaultSettings: GuiSettings = {
   showConfigPreview: false,
   enableBackups: true,
   backupCount: 5,
+  language: 'ru',
   windowState: undefined
 }
 
@@ -91,11 +93,13 @@ export const useGuiStore = () => {
     state.isLoading = true
     try {
       const result = await readGuiConfig()
+      console.log('Config from file: ', result)
       if (result.success && result.content) {
         try {
           const parsed = JSON.parse(result.content)
           // Merge with defaults using Object.assign to preserve reactivity
           Object.assign(state.settings, { ...defaultSettings, ...parsed })
+          console.log('Config from settings: ', state.settings)
           state.isDirty = false
         } catch (parseError) {
           console.warn('Failed to parse GUI config, using defaults:', parseError)

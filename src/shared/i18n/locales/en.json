@@ -98,7 +98,8 @@
     "acceleratedDelta": "Accelerated Delta",
     "setLastTrigger": "Set Last Trigger",
     "options": "Options",
-    "triggerEditor": "Trigger Editor"
+    "triggerEditor": "Trigger Editor",
+    "deleteTab": "Delete tab"
   },
   "deviceLabels": {
     "keyboard": "Keyboard",
