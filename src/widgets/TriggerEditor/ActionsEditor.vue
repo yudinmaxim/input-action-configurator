@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { BaseInput, BaseSelect, BaseButton } from '../../shared/ui/base'
 import BaseIconButton from '../../shared/ui/base/BaseIconButton.vue'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
 import MouseButtonsSelector from '../../shared/ui/base/MouseButtonsSelector.vue'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
+
+const { t: $t } = useI18n()
 
 interface InputEntry {
   keyboard?: string[]
@@ -436,7 +439,7 @@ Special (for update/tick):
 <template>
   <div class="bg-white border border-gray-200 rounded-md p-4">
     <div class="flex items-center gap-2 mb-4">
-      <h3 class="text-lg font-semibold text-gray-800">Actions</h3>
+      <h3 class="text-lg font-semibold text-gray-800">{{ $t('labels.actions') }}</h3>
       <FieldHelp><slot>{{ helpText }}</slot></FieldHelp>
     </div>
     
@@ -546,14 +549,14 @@ Special (for update/tick):
               <template v-if="getInputType(entry) === 'keyboard'">
                 <div class="flex flex-col gap-2">
                   <div>
-                    <label class="text-xs text-gray-500 mb-1 block">Modifiers</label>
+                    <label class="text-xs text-gray-500 mb-1 block">{{ $t('labels.modifiers') }}</label>
                     <KeyboardModifierToggles
                       :model-value="getKeyboardModifiers(entry)"
                       @update:model-value="(v) => updateKeyboardModifiers(actionIndex, entryIndex, v as string[])"
                     />
                   </div>
                   <div>
-                    <label class="text-xs text-gray-500 mb-1 block">Keys</label>
+                    <label class="text-xs text-gray-500 mb-1 block">{{ $t('labels.keys') }}</label>
                     <BaseInput
                       :model-value="getKeyboardKeys(entry).join(', ')"
                       placeholder="a, b, c или alt+tab"
@@ -571,7 +574,7 @@ Special (for update/tick):
                 <div class="flex flex-col gap-1">
                   <!-- Click/Down/Up mode -->
                   <div v-if="getMouseMode(actionIndex, entryIndex) !== 'custom'" class="mt-2">
-                    <label class="text-xs text-gray-500 mb-2 block">Buttons</label>
+                    <label class="text-xs text-gray-500 mb-2 block">{{ $t('labels.buttons') }}</label>
                     <MouseButtonsSelector
                       :model-value="getMouseButtonsForSelector(entry)"
                       @update:model-value="(buttons) => {

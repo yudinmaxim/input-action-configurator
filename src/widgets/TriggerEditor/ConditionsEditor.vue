@@ -358,7 +358,7 @@ any: [$window_class==firefox, $window_class==chrome]
 <template>
   <div class="bg-white border border-gray-200 rounded-md p-4">
     <div class="flex items-center gap-2 mb-4">
-      <h3 class="text-lg font-semibold text-gray-800">Conditions</h3>
+      <h3 class="text-lg font-semibold text-gray-800">{{ $t('labels.conditions') }}</h3>
       <FieldHelp>{{ helpText }}</FieldHelp>
     </div>
     
@@ -439,7 +439,7 @@ any: [$window_class==firefox, $window_class==chrome]
               <path d="M12 5v14M5 12h14"/>
             </svg>
           </template>
-          condition
+          {{ $t('conditionGroup.simpleLabel') }}
         </BaseButton>
         
         <BaseButton variant="green" :title="$t('conditions.any')" @click="doAddGroup('any')">
@@ -448,7 +448,7 @@ any: [$window_class==firefox, $window_class==chrome]
               <path d="M12 5v14M5 12h14"/>
             </svg>
           </template>
-          any
+          {{ $t('conditionGroup.any') }}
         </BaseButton>
         
         <BaseButton variant="amber" :title="$t('conditions.all')" @click="doAddGroup('all')">
@@ -457,7 +457,7 @@ any: [$window_class==firefox, $window_class==chrome]
               <path d="M12 5v14M5 12h14"/>
             </svg>
           </template>
-          all
+          {{ $t('conditionGroup.all') }}
         </BaseButton>
         
         <BaseButton variant="red" :title="$t('conditions.none')" @click="doAddGroup('none')">
@@ -466,7 +466,7 @@ any: [$window_class==firefox, $window_class==chrome]
               <path d="M12 5v14M5 12h14"/>
             </svg>
           </template>
-          none
+          {{ $t('conditionGroup.none') }}
         </BaseButton>
       </div>
     </div>

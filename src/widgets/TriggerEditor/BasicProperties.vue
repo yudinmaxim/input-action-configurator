@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { BaseInput, BaseSelect, BaseCard } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
+
+const { t: $t } = useI18n()
 
 interface Props {
   selectedTrigger: any
@@ -15,12 +18,12 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <BaseCard title="Basic Properties">
+  <BaseCard :title="$t('labels.basicProperties')">
     <div class="grid grid-cols-2 gap-4">
       <BaseInput
         :model-value="selectedTrigger.id || ''"
         expanded
-        label="ID"
+        :label="$t('labels.id')"
         @blur="emit('update-field', 'id', $event)"
       >
         <template #append>
@@ -33,13 +36,13 @@ const emit = defineEmits<{
         :model-value="selectedTrigger.type"
         expanded
         :options="[{value: selectedTrigger.type, label: selectedTrigger.type}]"
-        label="Type"
+        :label="$t('labels.type')"
         disabled
       />
       <BaseInput
         :model-value="selectedTrigger.threshold as string || ''"
         expanded
-        label="Threshold"
+        :label="$t('labels.threshold')"
         placeholder="optional"
         @update:model-value="emit('update-field', 'threshold', $event)"
       >
@@ -55,7 +58,7 @@ const emit = defineEmits<{
         :model-value="selectedTrigger.speed as string || ''"
         expanded
         :options="[{value:'', label:'Default'},{value:'fast', label:'Fast'},{value:'slow', label:'Slow'}]"
-        label="Speed"
+        :label="$t('labels.speed')"
         @update:model-value="emit('update-field', 'speed', $event || undefined)"
       >
         <template #append>

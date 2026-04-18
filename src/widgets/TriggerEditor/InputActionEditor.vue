@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { BaseInput, BaseButton, BaseSelect, BaseIconButton } from '../../shared/ui/base'
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
+
+const { t: $t } = useI18n()
 
 interface Props {
   actionItem: {
@@ -197,13 +200,13 @@ const removeMouseAction = (i: number) => {
   <div class="flex flex-col gap-3">
     <div>
       <div class="flex items-center gap-2 mb-2">
-        <span class="text-sm font-medium text-gray-700">Keyboard</span>
+        <span class="text-sm font-medium text-gray-700">{{ $t('labels.keyboard') }}</span>
         <FieldHelp>{{ keyboardHelp }}</FieldHelp>
       </div>
       
       <!-- Keyboard Modifiers Toggles -->
       <div class="mb-3">
-        <label class="block text-xs font-medium text-gray-500 mb-1">Modifiers</label>
+        <label class="block text-xs font-medium text-gray-500 mb-1">{{ $t('labels.modifiers') }}</label>
         <KeyboardModifierToggles v-model="modifiers" />
       </div>
       
@@ -249,7 +252,7 @@ const removeMouseAction = (i: number) => {
 
     <div>
       <div class="flex items-center gap-2 mb-2">
-        <span class="text-sm font-medium text-gray-700">Mouse</span>
+        <span class="text-sm font-medium text-gray-700">{{ $t('labels.mouse') }}</span>
         <FieldHelp>{{ mouseHelp }}</FieldHelp>
       </div>
       <div class="flex flex-col gap-2">

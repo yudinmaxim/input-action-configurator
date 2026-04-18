@@ -270,7 +270,7 @@ const markDirty = () => {
             </div>
             
             <div>
-              <label class="text-sm font-medium text-gray-700 mb-2">Conditions</label>
+              <label class="text-sm font-medium text-gray-700 mb-2">{{ $t('labels.conditions') }}</label>
               <div class="flex flex-col gap-2">
                 <div 
                   v-for="(cond, condIndex) in getConditionsArray(rule)" 
@@ -324,7 +324,7 @@ const markDirty = () => {
             </div>
             
             <div>
-              <label class="text-sm font-medium text-gray-700 mb-2 block">Properties</label>
+              <label class="text-sm font-medium text-gray-700 mb-2 block">{{ $t('labels.properties') }}</label>
               <div class="grid grid-cols-2 gap-2">
                 <div 
                   v-for="prop in DEVICE_PROPERTIES" 

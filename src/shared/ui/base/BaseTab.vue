@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { inject, type Ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import BaseIconButton from './BaseIconButton.vue'
+
+const { t: $t } = useI18n()
 
 interface IProps {
   id: string
@@ -53,7 +56,7 @@ const handleDelete = (event: Event) => {
         variant="delete"
         class="ml-1"
         @click="handleDelete"
-        title="Delete tab"
+        :title="$t('labels.deleteTab')"
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M2.5 3.5H11.5M5 3.5V2.5C5 2.22386 5.22386 2 5.5 2H8.5C8.77614 2 9 2.22386 9 2.5V3.5M6 6.5V10.5M8 6.5V10.5M3 3.5L3.5 11.5C3.5 11.7761 3.72386 12 4 12H10C10.2761 12 10.5 11.7761 10.5 11.5L11 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>

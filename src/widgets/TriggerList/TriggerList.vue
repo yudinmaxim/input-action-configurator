@@ -32,7 +32,7 @@ const selectedTriggerTriggers = computed(() => {
 <template>
   <div class="w-full h-full flex flex-col border-r border-gray-200 bg-white">
     <div class="p-4 border-b border-gray-200 flex justify-between items-center flex-shrink-0">
-      <h2 class="text-lg font-semibold text-gray-800">Triggers</h2>
+      <h2 class="text-lg font-semibold text-gray-800">{{ $t('labels.triggers') }}</h2>
       <button 
         v-if="selectedDevice"
         class="icon-btn"
@@ -55,7 +55,7 @@ const selectedTriggerTriggers = computed(() => {
     
     <div class="flex-1 overflow-y-auto p-2">
       <div v-if="!selectedDevice" class="p-4 text-center text-gray-500">
-        Select a device to see triggers
+        {{ $t('labels.selectDevice') }}
       </div>
       <div v-else>
         <TriggerCard

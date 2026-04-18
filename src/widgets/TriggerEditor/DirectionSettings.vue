@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { SwipeDirectionOptions, CircleDirectionOptions, MouseButtonOptions } from '../../shared/lib/stores/config'
 import { BaseSelect, BaseCheckbox, BaseCard } from '../../shared/ui/base'
+
+const { t: $t } = useI18n()
 
 interface Props {
   selectedTrigger: any
@@ -15,13 +18,13 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <BaseCard title="Direction & Movement">
+  <BaseCard :title="$t('labels.directionMovement')">
     <div class="grid grid-cols-2 gap-4">
       <BaseSelect
         v-if="selectedTrigger.type === 'swipe'"
         :model-value="selectedTrigger.direction"
         :options="SwipeDirectionOptions"
-        label="Direction"
+        :label="$t('labels.direction')"
         expanded
         @update:model-value="emit('update-field', 'direction', $event)"
       />
@@ -29,15 +32,15 @@ const emit = defineEmits<{
         v-if="selectedTrigger.type === 'circle'"
         :model-value="selectedTrigger.direction"
         :options="CircleDirectionOptions"
-        label="Direction"
+        :label="$t('labels.direction')"
         expanded
         @update:model-value="emit('update-field', 'direction', $event)"
       />
       <BaseSelect
         v-if="['touchpad', 'touchscreen'].includes(selectedDevice as string)"
         :model-value="selectedTrigger.fingers || 1"
-        :options="[{value:1, label:'1 finger'},{value:2, label:'2 fingers'},{value:3, label:'3 fingers'},{value:4, label:'4 fingers'}]"
-        label="Fingers"
+        :options="[{value:1, label:$t('labels.finger1')},{value:2, label:$t('labels.finger2')},{value:3, label:$t('labels.finger3')},{value:4, label:$t('labels.finger4')}]"
+        :label="$t('labels.fingers')"
         expanded
         @update:model-value="emit('update-field', 'fingers', Number($event))"
       />
@@ -45,19 +48,19 @@ const emit = defineEmits<{
         v-if="selectedDevice === 'mouse'"
         :model-value="selectedTrigger.mouse_buttons?.[0] || ''"
         :options="MouseButtonOptions"
-        label="Mouse Button"
-        placeholder="Any"
+        :label="$t('labels.mouseButton')"
+        :placeholder="$t('labels.any')"
         expanded
         @update:model-value="emit('update-field', 'mouse_buttons', $event ? [$event] : undefined)"
       />
       <BaseCheckbox
         :model-value="selectedTrigger.lock_pointer || false"
-        label="Lock Pointer"
+        :label="$t('labels.lockPointer')"
         @update:model-value="emit('update-field', 'lock_pointer', $event)"
       />
       <BaseCheckbox
         :model-value="selectedTrigger.bidirectional || false"
-        label="Bidirectional"
+        :label="$t('labels.bidirectional')"
         @update:model-value="emit('update-field', 'bidirectional', $event)"
       />
     </div>

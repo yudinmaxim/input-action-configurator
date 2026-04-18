@@ -322,7 +322,7 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                 <div v-if="editingIndex === index" class="p-4 bg-slate-800/50 space-y-4">
                   <div>
                     <div class="flex items-center justify-between mb-2">
-                      <label class="text-sm font-medium text-gray-300">Conditions</label>
+                      <label class="text-sm font-medium text-gray-300">{{ $t('labels.conditions') }}</label>
                       <BaseButton variant="blue" size="sm" @click="addCondition(rule)">
                           <template #icon-left>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -413,7 +413,7 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                   </div>
                   
                   <div>
-                    <label class="text-sm font-medium text-gray-300 mb-2 block">Properties</label>
+                    <label class="text-sm font-medium text-gray-300 mb-2 block">{{ $t('labels.properties') }}</label>
                     <div class="grid grid-cols-2 gap-3">
                       <div 
                         v-for="prop in DEVICE_PROPERTIES" 

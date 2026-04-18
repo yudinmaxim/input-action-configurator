@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { BaseButton, BaseInput, BaseSelect } from '../../shared/ui/base'
+
+const { t: $t } = useI18n()
 
 const props = defineProps<{
   selectedDevice: string | null
@@ -56,16 +59,16 @@ const createNewTrigger = () => {
         v-model="newTriggerType"
         :options="availableTriggerTypes"
         placeholder="Select trigger type"
-        label="Type"
+        :label="$t('labels.type')"
       />
       <BaseInput
         v-model="newTriggerId"
-        label="ID"
+        :label="$t('labels.id')"
         placeholder="unique-trigger-id"
       />
       <div class="flex gap-2">
-        <BaseButton size="sm" @click="createNewTrigger">Create</BaseButton>
-        <BaseButton size="sm" variant="ghost" @click="emit('cancel')">Cancel</BaseButton>
+        <BaseButton size="sm" @click="createNewTrigger">{{ $t('labels.create') }}</BaseButton>
+        <BaseButton size="sm" variant="ghost" @click="emit('cancel')">{{ $t('labels.cancel') }}</BaseButton>
       </div>
     </div>
   </div>
