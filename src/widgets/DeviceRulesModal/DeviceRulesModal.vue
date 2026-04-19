@@ -73,12 +73,12 @@ const categoryIcons: Record<string, string> = {
   touchscreen: '📱'
 }
 
-const categoryLabels: Record<string, string> = {
-  keyboard: 'Клавиатура',
-  mouse: 'Мышь',
-  touchpad: 'Тачпад',
-  touchscreen: 'Тачскрин'
-}
+const categoryLabels: Record<string, string> = computed(() => ({
+  keyboard: $t('deviceRules.category.keyboard'),
+  mouse: $t('deviceRules.category.mouse'),
+  touchpad: $t('deviceRules.category.touchpad'),
+  touchscreen: $t('deviceRules.category.touchscreen')
+}))
 
 const close = () => {
   emit('update:modelValue', false)
@@ -115,18 +115,18 @@ const removeRule = (index: number) => {
   }
 }
 
-const DEVICE_CONDITION_VARS = [
-  { value: '$name', label: '$name (имя устройства)' },
-  { value: '$types', label: '$types (флаги типов)' },
-  { value: '$keyboard', label: '$keyboard' },
-  { value: '$mouse', label: '$mouse' },
-  { value: '$touchpad', label: '$touchpad' },
-  { value: '$touchscreen', label: '$touchscreen' },
-]
+const DEVICE_CONDITION_VARS = computed(() => [
+  { value: '$name', label: $t('deviceRules.condition.name') },
+  { value: '$types', label: $t('deviceRules.condition.types') },
+  { value: '$keyboard', label: $t('deviceRules.condition.keyboard') },
+  { value: '$mouse', label: $t('deviceRules.condition.mouse') },
+  { value: '$touchpad', label: $t('deviceRules.condition.touchpad') },
+  { value: '$touchscreen', label: $t('deviceRules.condition.touchscreen') },
+])
 
 const DEVICE_PROPERTIES = [
-  { key: 'ignore', label: 'Ignore (игнорировать)', type: 'boolean' },
-  { key: 'grab', label: 'Grab (перехват)', type: 'boolean' },
+  { key: 'ignore', label: $t('deviceRules.propertyIgnore'), type: 'boolean' },
+  { key: 'grab', label: $t('deviceRules.propertyGrab'), type: 'boolean' },
   { key: 'buttonpad', label: 'Buttonpad', type: 'boolean' },
   { key: 'handle_evdev_events', label: 'Handle Evdev Events', type: 'boolean' },
   { key: 'motion_timeout', label: 'Motion Timeout (ms)', type: 'number' },
@@ -174,21 +174,21 @@ const serializeCondition = (parsed: ParsedCondition): string => {
 const getRuleDescription = (rule: DeviceRule): string => {
   // conditions может быть строкой или массивом
   if (!rule.conditions) {
-    return 'Без условий'
+    return $t('deviceRules.noConditions')
   }
   if (typeof rule.conditions === 'string') {
     return rule.conditions
   }
   if (Array.isArray(rule.conditions)) {
     if (rule.conditions.length === 0) {
-      return 'Без условий'
+      return $t('deviceRules.noConditions')
     }
     const condStr = rule.conditions
       .map((c: any) => typeof c === 'string' ? c : String(c))
       .join(', ')
     return condStr.length > 50 ? condStr.slice(0, 50) + '...' : condStr
   }
-  return 'Без условий'
+  return $t('deviceRules.noConditions')
 }
 
 const getPropertyValue = (rule: DeviceRule, key: string): any => {
@@ -260,9 +260,9 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
         <div class="bg-slate-900 rounded-lg shadow-xl w-[900px] max-h-[85vh] overflow-hidden flex flex-col text-gray-200">
           <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center">
             <div class="flex items-center gap-3">
-              <h3 class="text-lg font-semibold text-gray-200">Device Rules</h3>
+              <h3 class="text-lg font-semibold text-gray-200">{{ $t('deviceRules.title') }}</h3>
               <span class="text-xs text-gray-400 bg-slate-800 px-2 py-1 rounded">
-                {{ rules.length }} правил
+                {{ rules.length }} {{ $t('deviceRules.rules') }}
               </span>
             </div>
             <BaseIconButton variant="close" @click="close">
@@ -290,7 +290,7 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                 >
                   <div class="flex items-center gap-3">
                     <span class="text-sm font-medium text-gray-300">
-                      Правило #{{ index + 1 }}
+                      {{ $t('deviceRules.rule') }} #{{ index + 1 }}
                     </span>
                     <span class="text-xs text-gray-500 max-w-md truncate">
                       {{ getRuleDescription(rule) }}
@@ -302,7 +302,7 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                       class="text-xs px-2 py-1 rounded"
                       :class="rule.ignore ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'"
                     >
-                      {{ rule.ignore ? 'ignore' : 'active' }}
+                      {{ rule.ignore ? $t('deviceRules.ignore') : $t('deviceRules.active') }}
                     </span>
                     <BaseIconButton variant="delete" @click.stop="removeRule(index)">
                       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -329,12 +329,12 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                               <path d="M12 5v14M5 12h14"/>
                             </svg>
                           </template>
-                          условие
+                          {{ $t('deviceRules.addConditionBtn') }}
                         </BaseButton>
                     </div>
                     
                     <div v-if="inputDevices.length > 0" class="mb-3">
-                      <div class="text-xs text-gray-400 mb-2">Выберите устройство:</div>
+                      <div class="text-xs text-gray-400 mb-2">{{ $t('deviceRules.selectDevice') }}</div>
                       <div class="flex flex-col gap-3">
                         <div 
                           v-for="(devices, category) in devicesByCategory" 
@@ -376,7 +376,7 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                       >
                         <BaseSelect
                           :model-value="parseCondition(String(cond)).var"
-                          :options="DEVICE_CONDITION_VARS"
+                          :options="[...DEVICE_CONDITION_VARS]"
                           class="w-48"
                           @update:model-value="(v) => {
                             const parsed = parseCondition(String(cond))
@@ -408,7 +408,7 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
                       </div>
                     </div>
                     <p v-else class="text-xs text-gray-500 italic">
-                      Без условий - правило применяется ко всем устройствам
+                      {{ $t('deviceRules.noConditionsHint') }}
                     </p>
                   </div>
                   
@@ -443,7 +443,7 @@ const getConditionsArray = (rule: DeviceRule): any[] => {
           
           <div class="px-6 py-4 border-t border-slate-700 flex justify-between items-center bg-slate-800">
             <BaseButton variant="blue" @click="addRule">
-              + Добавить правило
+              + {{ $t('deviceRules.addRule') }}
             </BaseButton>
             <div class="flex gap-3">
               <BaseButton variant="secondary" @click="close">

@@ -57,9 +57,9 @@
     "pickWindow": "Select Window",
     "install": "Install"
   },
-  "form": {
+"form": {
     "value": "value",
-    "browse": "Browse"
+    "placeholder": "value"
   },
 "labels": {
     "properties": "Properties",
@@ -132,5 +132,86 @@
     "focusNotifierInstall": "How to install",
     "dontShowAgain": "Don't show again",
     "gotIt": "Got it!"
+  },
+  "deviceRules": {
+    "title": "Device Rules",
+    "noRules": "No device rules",
+    "rule": "Rule",
+    "rules": "rules",
+    "noConditions": "No conditions",
+    "noConditionsHint": "Without conditions - rule applies to all devices",
+    "devices": "Devices",
+    "selectDevice": "Select device:",
+    "addCondition": "add condition",
+    "addConditionBtn": "condition",
+    "boolean": "(boolean)",
+    "addRule": "Add rule",
+    "addRuleBtn": "Add Rule",
+    "ignore": "ignore",
+    "active": "active",
+    "category": {
+      "keyboard": "Keyboard",
+      "mouse": "Mouse",
+      "touchpad": "Touchpad",
+      "touchscreen": "Touchscreen"
+    },
+    "condition": {
+      "name": "$name",
+      "nameSelect": "$name (device select)",
+      "nameFree": "$name (free input)",
+      "types": "$types (type flags)",
+      "keyboard": "$keyboard",
+      "mouse": "$mouse",
+      "touchpad": "$touchpad",
+      "touchscreen": "$touchscreen"
+    },
+    "inputDevices": "Input Devices - Quick Select",
+    "inputDevicesHint": "Click a device to add it to conditions",
+    "property": {
+      "ignore": {
+        "label": "Ignore",
+        "description": "Completely ignore the device. All events from it will be dropped and won't reach the system."
+      },
+      "grab": {
+        "label": "Grab",
+        "description": "Exclusive device grab. Other applications won't be able to receive events from this device."
+      },
+      "buttonpad": {
+        "label": "Buttonpad",
+        "description": "Touchpad without physical buttons (buttons built into the surface, like MacBook). Clicks are detected by pressure."
+      },
+      "handle_evdev_events": {
+        "label": "Handle Evdev Events",
+        "description": "Handle raw Linux kernel events (evdev). Usually enabled by default."
+      },
+      "motion_timeout": {
+        "label": "Motion Timeout (ms)",
+        "description": "Milliseconds without motion before a gesture is considered completed. Affects swipe/pinch gesture end detection."
+      },
+      "motion_threshold": {
+        "label": "Motion Threshold",
+        "description": "Minimum movement distance (in arbitrary units) to start tracking a gesture. Protection against accidental touches."
+      },
+      "motion_threshold_2": {
+        "label": "Motion Threshold 2",
+        "description": "Threshold for second level of motion. Used in complex gestures."
+      },
+      "motion_threshold_3": {
+        "label": "Motion Threshold 3",
+        "description": "Threshold for third level of motion."
+      },
+      "press_timeout": {
+        "label": "Press Timeout (ms)",
+        "description": "Maximum touch hold time before gesture type is determined."
+      },
+      "click_timeout": {
+        "label": "Click Timeout (ms)",
+        "description": "Maximum interval between two touches to determine a double tap."
+      },
+      "unblock_buttons_on_timeout": {
+        "label": "Unblock Buttons on Timeout",
+        "description": "Unblock touchpad software buttons."
+      }
+    }
   }
 }
