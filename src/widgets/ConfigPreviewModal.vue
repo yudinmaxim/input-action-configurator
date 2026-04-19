@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useConfigStore } from '../shared/lib/stores/config'
 import { useGuiStore } from '../shared/lib/stores/gui'
 import { dumpInputActionsConfig } from '../shared/lib/yaml-converter'
 import BaseIconButton from '../shared/ui/base/BaseIconButton.vue'
 
-defineProps<{
+const props = defineProps<{
   modelValue: boolean
 }>()
 
@@ -23,8 +23,17 @@ const yamlOutput = computed(() => {
 const configFilePath = computed(() => guiStore.settings.value?.configFilePath || 'Not set')
 
 const close = () => {
+  document.body.style.overflow = ''
   emit('update:modelValue', false)
 }
+
+watch(() => props.modelValue, (visible) => {
+  if (visible) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
+  }
+})
 </script>
 
 <template>
@@ -41,7 +50,7 @@ const close = () => {
               <h3 class="text-lg font-semibold text-gray-200">Config Preview</h3>
               <p class="text-xs text-gray-400 mt-1 truncate max-w-md">{{ configFilePath }}</p>
             </div>
-            <BaseIconButton variant="close" @click="close">
+            <BaseIconButton variant="close" class="text-white hover:text-gray-200" @click="close">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M1 1L13 13M1 13L13 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>

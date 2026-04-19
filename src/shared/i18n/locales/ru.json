@@ -10,6 +10,7 @@
   "app": {
     "addDevice": "Добавить устройство",
     "showConfig": "Показать конфиг",
+    "showSettings": "Настройки",
     "undo": "Отменить (Ctrl+Z)",
     "redo": "Вернуть (Ctrl+Y)"
   },
@@ -109,5 +110,14 @@
     "touchscreen": "Touchscreen",
     "deviceRules": "Device Rules"
   },
-  "deviceDeleteConfirm": "Вы уверены, что хотите удалить устройство '{name}' и все его триггеры? Это действие нельзя отменить."
+  "deviceDeleteConfirm": "Вы уверены, что хотите удалить устройство '{name}' и все его триггеры? Это действие нельзя отменить.",
+  "settings": {
+    "title": "Настройки",
+    "language": "Язык",
+    "configFilePath": "Путь к конфигу",
+    "backups": "Резервные копии",
+    "enableBackups": "Включить резервные копии",
+    "backupCount": "Количество копий",
+    "backupCountHint": "Максимум файлов для хранения"
+  }
 }

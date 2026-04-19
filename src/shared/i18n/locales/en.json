@@ -10,6 +10,7 @@
   "app": {
     "addDevice": "Add Device",
     "showConfig": "Show Config",
+    "showSettings": "Settings",
     "undo": "Undo (Ctrl+Z)",
     "redo": "Redo (Ctrl+Y)"
   },
@@ -107,5 +108,14 @@
     "touchpad": "Touchpad",
     "touchscreen": "Touchscreen",
     "deviceRules": "Device Rules"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "configFilePath": "Config file path",
+    "backups": "Backups",
+    "enableBackups": "Enable backups",
+    "backupCount": "Number of backups",
+    "backupCountHint": "Maximum files to keep"
   }
 }

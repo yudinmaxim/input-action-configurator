@@ -6,6 +6,7 @@ interface IProps {
   type?: string
   placeholder?: string
   label?: string
+  hint?: string
   error?: string
   disabled?: boolean
   expanded?: boolean
@@ -16,6 +17,7 @@ const {
   type = 'text',
   placeholder = '',
   label = '',
+  hint = '',
   error = '',
   disabled = false,
   expanded = false
@@ -54,5 +56,6 @@ const widthClass = computed(() => expanded ? 'w-full' : 'w-fit')
       </div>
     </div>
     <span v-if="error" class="text-sm text-red-500">{{ error }}</span>
+    <span v-else-if="hint" class="text-xs text-gray-500">{{ hint }}</span>
   </div>
 </template>
