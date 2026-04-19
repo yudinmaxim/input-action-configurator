@@ -9,7 +9,6 @@ interface IProps {
   disabled?: boolean
   multiple?: boolean
   showValueInTitle?: boolean
-
   expanded?: boolean
 }
 
@@ -23,6 +22,8 @@ const {
   showValueInTitle = true,
   expanded = false
 } = defineProps<IProps>()
+
+const isOpen = ref(false)
 
 const widthClass = computed(() => expanded ? 'w-full' : 'w-fit')
 
@@ -79,6 +80,8 @@ const selectTitle = computed(() => {
         class="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md text-base text-gray-800 bg-white transition-colors cursor-pointer hover:border-gray-400 outline-none appearance-none"
         :class="[disabled && 'bg-gray-50 cursor-not-allowed opacity-50']"
         @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+        @focus="isOpen = true"
+        @blur="isOpen = false"
       >
         <option v-if="placeholder" value="" disabled>{{ placeholder }}</option>
         <option

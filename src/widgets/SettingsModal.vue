@@ -2,9 +2,8 @@
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGuiStore } from '../shared/lib/stores/gui'
-import { open } from '@tauri-apps/plugin-dialog'
+import { open as openFileDialog } from '@tauri-apps/plugin-dialog'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
-import { open as openPath } from '@tauri-apps/plugin-fs'
 import BaseIconButton from '../shared/ui/base/BaseIconButton.vue'
 import BaseInput from '../shared/ui/base/BaseInput.vue'
 import BaseSelect from '../shared/ui/base/BaseSelect.vue'
@@ -51,7 +50,7 @@ const close = () => {
 
 const browseConfigFile = async () => {
   try {
-    const selected = await open({
+    const selected = await openFileDialog({
       multiple: false,
       filters: [{
         name: 'YAML',
@@ -72,18 +71,6 @@ const copyPath = async () => {
     await writeText(configFilePath.value)
   } catch (e) {
     console.warn('Failed to copy path:', e)
-  }
-}
-
-const openLocation = async () => {
-  if (!configFilePath.value) return
-  try {
-    const parent = configFilePath.value.split('/').slice(0, -1).join('/')
-    if (parent) {
-      await openPath(parent)
-    }
-  } catch (e) {
-    console.warn('Failed to open location:', e)
   }
 }
 
@@ -143,11 +130,6 @@ const saveSettings = () => {
                   <BaseIconButton variant="icon" :title="$t('settings.copyPath')" :disabled="!configFilePath" @click="copyPath">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                    </svg>
-                  </BaseIconButton>
-                  <BaseIconButton variant="icon" :title="$t('settings.openLocation')" :disabled="!configFilePath" @click="openLocation">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 9"/>
                     </svg>
                   </BaseIconButton>
                 </div>

@@ -25,6 +25,9 @@
     "fs:default",
     "fs:allow-exists",
     "fs:allow-read",
-    "fs:allow-open"
+    "fs:allow-open",
+    "shell:default",
+    "shell:allow-open",
+    "shell:allow-execute"
   ]
 }

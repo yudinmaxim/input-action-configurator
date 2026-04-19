@@ -645,6 +645,15 @@ fn window_detector_get_active() -> ActiveWindow {
 }
 
 #[tauri::command]
+fn open_directory_dummy(path: String) -> ConfigResult {
+    ConfigResult {
+        success: true,
+        content: Some(path),
+        error: None,
+    }
+}
+
+#[tauri::command]
 fn get_input_devices() -> DeviceListResult {
     let content = match fs::read_to_string("/proc/bus/input/devices") {
         Ok(c) => c,
@@ -849,9 +858,11 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             read_config,
             write_config,
+            open_directory_dummy,
             get_gui_config_path,
             read_gui_config,
             write_gui_config,

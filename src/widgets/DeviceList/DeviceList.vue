@@ -50,7 +50,13 @@ const getDeviceIcon = (type: string) => {
 }
 
 const getDeviceLabel = (type: string) => {
-  return type === 'device-rules' ? $t('deviceLabels.deviceRules') : $t(`deviceLabels.${type}`)
+  if (!type) return ''
+  if (type === 'device-rules') {
+    return $t('deviceLabels.deviceRules')
+  }
+  const key = `deviceLabels.${type}`
+  const translated = $t(key)
+  return translated !== key ? translated : type
 }
 </script>
 
