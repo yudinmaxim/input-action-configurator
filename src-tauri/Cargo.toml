@@ -16,6 +16,9 @@ tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_yaml = "0.9"
 dirs = "5"
+tauri-plugin-dialog = "2.7.0"
+tauri-plugin-clipboard-manager = "2.3.2"
+tauri-plugin-fs = "2.5.0"
 
 [features]
 default = ["custom-protocol"]

@@ -10,6 +10,7 @@ interface IProps {
   error?: string
   disabled?: boolean
   expanded?: boolean
+  iconsOverlay?: boolean
 }
 
 const {
@@ -20,7 +21,8 @@ const {
   hint = '',
   error = '',
   disabled = false,
-  expanded = false
+  expanded = false,
+  iconsOverlay = false
 } = defineProps<IProps>()
 
 const emit = defineEmits<{
@@ -43,15 +45,16 @@ const widthClass = computed(() => expanded ? 'w-full' : 'w-fit')
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
-        class="w-full px-3 py-2 border rounded-md text-base text-gray-800 bg-white transition-colors outline-none hover:border-gray-400 "
+        class="w-full px-3 py-2 border rounded-md text-base text-gray-800 bg-white transition-colors outline-none hover:border-gray-400"
         :class="[
           error ? 'border-red-500 focus:border-red-500' : 'border-gray-300',
-          disabled && 'bg-gray-50 cursor-not-allowed opacity-50'
+          disabled && 'bg-gray-50 cursor-not-allowed opacity-50',
+          iconsOverlay ? 'truncate pr-24' : 'pr-10'
         ]"
         @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
         @blur="emit('blur', ($event.target as HTMLInputElement).value)"
       />
-      <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
+      <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center pr-1" :class="iconsOverlay && 'right-1'">
         <slot name="append" />
       </div>
     </div>

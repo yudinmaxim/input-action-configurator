@@ -58,7 +58,8 @@
     "install": "Install"
   },
   "form": {
-    "value": "value"
+    "value": "value",
+    "browse": "Browse"
   },
 "labels": {
     "properties": "Properties",
@@ -116,6 +117,8 @@
     "backups": "Backups",
     "enableBackups": "Enable backups",
     "backupCount": "Number of backups",
-    "backupCountHint": "Maximum files to keep"
+    "backupCountHint": "Maximum files to keep",
+    "copyPath": "Copy path",
+    "openLocation": "Open location"
   }
 }

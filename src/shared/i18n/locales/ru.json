@@ -58,8 +58,9 @@
     "pickWindow": "Выбрать окно",
     "install": "Установить"
   },
-  "form": {
-    "value": "значение"
+"form": {
+    "value": "значение",
+    "browse": "Обзор"
   },
 "labels": {
     "properties": "Свойства",
@@ -118,6 +119,8 @@
     "backups": "Резервные копии",
     "enableBackups": "Включить резервные копии",
     "backupCount": "Количество копий",
-    "backupCountHint": "Максимум файлов для хранения"
+    "backupCountHint": "Максимум файлов для хранения",
+    "copyPath": "Копировать путь",
+    "openLocation": "Открыть расположение"
   }
 }
