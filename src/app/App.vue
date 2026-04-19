@@ -10,6 +10,7 @@ import { TriggerList } from '../widgets/TriggerList'
 import { TriggerEditor } from '../widgets/TriggerEditor'
 import ConfigPreviewModal from '../widgets/ConfigPreviewModal.vue'
 import SettingsModal from '../widgets/SettingsModal.vue'
+import WelcomeModal from '../widgets/WelcomeModal.vue'
 import DeviceRulesEditor from '../widgets/DeviceRulesEditor/DeviceRulesEditor.vue'
 import { DeviceType } from '../shared/lib/stores/config'
 import BaseDropdown from '../shared/ui/base/BaseDropdown.vue'
@@ -64,6 +65,10 @@ onMounted(async () => {
       // Set config preview modal state
       if (guiSettings.showConfigPreview !== undefined) {
         showConfigPreview.value = guiSettings.showConfigPreview
+      }
+      // Show welcome modal on first launch
+      if (!guiSettings.hasSeenWelcome) {
+        showWelcome.value = true
       }
     }
   } catch (e) {
@@ -238,6 +243,7 @@ const confirmAddDevice = (deviceType: string | number) => {
 }
 
 const showConfigPreview = ref(false)
+const showWelcome = ref(false)
 const showSettings = ref(false)
 
 // Watch for GUI state changes and save to store
@@ -447,6 +453,9 @@ onUnmounted(() => {
     />
     <SettingsModal
       v-model="showSettings"
+    />
+    <WelcomeModal
+      v-model="showWelcome"
     />
   </div>
 </template>

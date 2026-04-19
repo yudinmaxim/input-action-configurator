@@ -122,5 +122,17 @@
     "backupCountHint": "Максимум файлов для хранения",
     "copyPath": "Копировать путь",
     "openLocation": "Открыть расположение"
+  },
+  "welcome": {
+    "title": "Добро пожаловать!",
+    "description": "Это конфигуратор для Input Actions - утилиты для настройки жестов и действий на устройствах ввода.",
+    "inputActionsTitle": "InputActions",
+    "inputActionsDesc": "Для работы приложения нужен демон InputActions. Установите его и настройте конфигурацию жестов.",
+    "inputActionsInstall": "Как установить",
+    "focusNotifierTitle": "FocusNotifier (опционально)",
+    "focusNotifierDesc": "Для автовыбора приложения нужен KWin скрипт FocusNotifier. Без него автовыбор работать не будет.",
+    "focusNotifierInstall": "Как установить",
+    "dontShowAgain": "Больше не показывать",
+    "gotIt": "Понятно!"
   }
 }

@@ -69,9 +69,12 @@ const TYPE_CONFIG = {
 
 interface Props {
   modelValue: GroupCondition
+  focusNotifierAvailable?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  focusNotifierAvailable: true
+})
 
 const emit = defineEmits<{
   'update:modelValue': [value: GroupCondition]
@@ -169,6 +172,7 @@ const getModifiers = (condition: SimpleCondition): string[] => {
             @update:model-value="(v: string) => updateValue(index, v)"
           />
           <BaseIconButton 
+            v-if="focusNotifierAvailable"
             variant="app-select"
             :title="$t('conditionGroup.pickWindow')"
             @click="emit('pickWindow', index)"

@@ -120,5 +120,17 @@
     "backupCountHint": "Maximum files to keep",
     "copyPath": "Copy path",
     "openLocation": "Open location"
+  },
+  "welcome": {
+    "title": "Welcome!",
+    "description": "This is a configurator for Input Actions - a utility for configuring gestures and actions on input devices.",
+    "inputActionsTitle": "InputActions",
+    "inputActionsDesc": "The InputActions daemon is required for this app to work. Install it and configure your gestures.",
+    "inputActionsInstall": "How to install",
+    "focusNotifierTitle": "FocusNotifier (optional)",
+    "focusNotifierDesc": "The KWin script FocusNotifier is required for auto-selecting application. Without it, auto-select won't work.",
+    "focusNotifierInstall": "How to install",
+    "dontShowAgain": "Don't show again",
+    "gotIt": "Got it!"
   }
 }

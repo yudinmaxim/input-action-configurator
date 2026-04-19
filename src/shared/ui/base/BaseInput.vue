@@ -39,22 +39,30 @@ const widthClass = computed(() => expanded ? 'w-full' : 'w-fit')
       {{ label }}
       <slot name="label-before" />
     </label>
-    <div class="relative flex" :class="widthClass">
+    <div
+      class="relative flex border-1 border-solid rounded bg-white transition-colors"
+      :class="[
+        widthClass,
+        error ? 'border-red-500' : 'border-gray-200',
+        disabled ? 'bg-gray-50 cursor-not-allowed opacity-50' : 'hover:border-gray-300'
+      ]"
+    >
       <input
         :type="type"
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
-        class="w-full px-3 py-2 border rounded-md text-base text-gray-800 bg-white transition-colors outline-none hover:border-gray-400"
+        class="w-full px-3 py-2 text-base text-gray-800 bg-transparent outline-none border-none truncate"
         :class="[
-          error ? 'border-red-500 focus:border-red-500' : 'border-gray-300',
-          disabled && 'bg-gray-50 cursor-not-allowed opacity-50',
-          iconsOverlay ? 'truncate pr-24' : 'pr-10'
+          disabled ? 'cursor-not-allowed' : ''
         ]"
         @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
         @blur="emit('blur', ($event.target as HTMLInputElement).value)"
       />
-      <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center pr-1" :class="iconsOverlay && 'right-1'">
+      <div 
+        v-if="$slots.append" 
+        class="flex items-center mr-3"
+      >
         <slot name="append" />
       </div>
     </div>

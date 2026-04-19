@@ -11,6 +11,7 @@ export interface GuiSettings {
   enableBackups: boolean
   backupCount: number
   language: string
+  hasSeenWelcome?: boolean
   windowState?: {
     width: number
     height: number

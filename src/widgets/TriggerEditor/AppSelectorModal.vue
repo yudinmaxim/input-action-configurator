@@ -7,6 +7,7 @@ import {
   installDetector,
   getActiveWindow
 } from '../../entities/window-detector'
+import { configLinks } from '../../shared/lib/configLinks'
 
 const props = defineProps<{
   modelValue: boolean

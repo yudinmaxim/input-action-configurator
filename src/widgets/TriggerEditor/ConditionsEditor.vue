@@ -5,9 +5,18 @@ import { BaseInput, BaseSelect, BaseButton, BaseIconButton } from '../../shared/
 import FieldHelp from '../../shared/ui/base/FieldHelp.vue'
 import ConditionGroup from '../../shared/ui/base/ConditionGroup.vue'
 import KeyboardModifierToggles from './KeyboardModifierToggles.vue'
-import { getActiveWindow } from '../../entities/window-detector'
+import { getActiveWindow, checkInstalled, checkServiceRunning } from '../../entities/window-detector'
+import { configLinks } from '../../shared/lib/configLinks'
 
 const { t: $t } = useI18n()
+
+const focusNotifierAvailable = ref(false)
+
+onMounted(async () => {
+  const installed = await checkInstalled()
+  const running = await checkServiceRunning()
+  focusNotifierAvailable.value = installed && running
+})
 
 interface GroupCondition {
   groupType: 'any' | 'all' | 'none'
@@ -362,11 +371,19 @@ any: [$window_class==firefox, $window_class==chrome]
       <FieldHelp>{{ helpText }}</FieldHelp>
     </div>
     
+    <div v-if="!focusNotifierAvailable" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
+      <p class="text-sm text-amber-700">
+        FocusNotifier не установлен. Автовыбор класса, типа и имени окна приложения работать не будет.
+        <a :href="configLinks.focusNotifier" target="_blank" class="underline">Как установить</a>
+      </p>
+    </div>
+    
     <div class="flex flex-col gap-2">
       <div v-for="(c, i) in list" :key="i">
         <ConditionGroup
           v-if="isGroup(c)"
           :model-value="getGroup(c)"
+          :focusNotifierAvailable="focusNotifierAvailable"
           @update:model-value="(v) => onGroupUpdate(i, v)"
           @delete="remove(i)"
           @pick-window="(subI) => startCountdown(i, subI)"
