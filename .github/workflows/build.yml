@@ -38,22 +38,10 @@ jobs:
         
       - name: Build Tauri app
         run: npx tauri build --target x86_64-unknown-linux-gnu --bundles appimage
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+        
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
         with:
           name: appimage
           path: src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
-          
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: Input Action Configurator ${{ github.ref_name }}
-          body: Input Action Configurator - Configuration editor for InputActions
-          draft: true
-          files: src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          retention-days: 30
