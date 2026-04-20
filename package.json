@@ -1,10 +1,11 @@
 {
-  "name": "input-action-confidurator",
+  "name": "input-action-configurator",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "clean": "rimraf dist",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit",
     "test": "vitest run",

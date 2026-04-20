@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import UnoCSS from 'unocss/vite'
-import { resolve } from 'path'
+import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
   plugins: [vue(), UnoCSS()],
@@ -13,7 +13,7 @@ export default defineConfig({
   envPrefix: ['VITE_', 'TAURI_'],
   resolve: {
     alias: {
-      '@entities': resolve(__dirname, 'src/entities'),
+      '@entities': fileURLToPath(new URL('./src/entities', import.meta.url)),
     }
   },
   build: {
