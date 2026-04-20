@@ -39,9 +39,11 @@ jobs:
       - name: Build Tauri app
         run: npx tauri build --target x86_64-unknown-linux-gnu --bundles appimage
         
-      - name: Upload AppImage
-        uses: actions/upload-artifact@v4
+      - name: Create Release and Upload AppImage
+        uses: ncipollo/release-action@v1
         with:
-          name: appimage
-          path: src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
-          retention-days: 30
+          artifacts: "src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage"
+          name: Input Action Configurator ${{ github.ref_name }}
+          body: "Input Action Configurator - Configuration editor for InputActions"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generateReleaseNotes: true
