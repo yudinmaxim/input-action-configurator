@@ -1,0 +1,5 @@
+{
+  "name": "FocusNotifier",
+  "version": "1.0.0",
+  "description": "KWin script to notify about focused window changes"
+}
