@@ -21,8 +21,9 @@ jobs:
           cache: 'npm'
           
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@master
         with:
+          toolchain: stable
           targets: 'x86_64-unknown-linux-gnu'
           
       - name: Install system dependencies
