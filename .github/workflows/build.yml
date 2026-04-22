@@ -45,12 +45,23 @@ jobs:
         run: |
           echo "=== AppImage artifacts ==="
           find src-tauri/target -name "*.AppImage" -type f
-          ls -la src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/ || true
+          ls -la src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/ || echo "Directory does not exist"
+          
+      - name: Verify AppImage exists
+        run: |
+          APPIMAGE=$(find src-tauri/target -name "*.AppImage" -type f | head -n 1)
+          if [ -z "$APPIMAGE" ]; then
+            echo "Error: No AppImage found!"
+            exit 1
+          fi
+          echo "Found AppImage: $APPIMAGE"
+          echo "Size: $(ls -lh "$APPIMAGE" | awk '{print $5}')"
+          echo "APPIMAGE_PATH=$APPIMAGE" >> $GITHUB_ENV
           
       - name: Create Release and Upload AppImage
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage"
+          artifacts: "${{ env.APPIMAGE_PATH }}"
           name: Input Action Configurator ${{ github.ref_name }}
           body: "Input Action Configurator - Configuration editor for InputActions"
           token: ${{ secrets.GITHUB_TOKEN }}
