@@ -30,7 +30,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev librsvg2-dev patchelf libgtk-3-dev libayatana-appindicator3-dev libfuse2
+          sudo apt-get install -y libwebkit2gtk-4.1-dev librsvg2-dev patchelf libgtk-3-dev libayatana-appindicator3-dev libfuse2 squashfs-tools
           
       - name: Install npm dependencies
         run: npm install
@@ -45,9 +45,9 @@ jobs:
         run: |
           echo "=== AppImage artifacts ==="
           find src-tauri/target -name "*.AppImage" -type f
-          ls -la src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/ || echo "Directory does not exist"
+          ls -lh src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/ || echo "Directory does not exist"
           
-      - name: Verify AppImage exists
+      - name: Verify AppImage exists and check contents
         run: |
           APPIMAGE=$(find src-tauri/target -name "*.AppImage" -type f | head -n 1)
           if [ -z "$APPIMAGE" ]; then
@@ -56,6 +56,8 @@ jobs:
           fi
           echo "Found AppImage: $APPIMAGE"
           echo "Size: $(ls -lh "$APPIMAGE" | awk '{print $5}')"
+          echo "=== AppImage contents preview ==="
+          unsquashfs -l "$APPIMAGE" 2>/dev/null | head -50 || echo "Cannot list contents (may need squashfs-tools)"
           echo "APPIMAGE_PATH=$APPIMAGE" >> $GITHUB_ENV
           
       - name: Create Release and Upload AppImage
