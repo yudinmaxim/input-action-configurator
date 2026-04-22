@@ -45,11 +45,12 @@ jobs:
         run: |
           echo "=== AppImage artifacts ==="
           find src-tauri/target -name "*.AppImage" -type f
+          ls -la src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/ || true
           
       - name: Create Release and Upload AppImage
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "src-tauri/target/x86_64-unknown-linux-gnu/release/Input_Action_Configurator*.AppImage"
+          artifacts: "src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage"
           name: Input Action Configurator ${{ github.ref_name }}
           body: "Input Action Configurator - Configuration editor for InputActions"
           token: ${{ secrets.GITHUB_TOKEN }}
