@@ -12,6 +12,9 @@ jobs:
     permissions:
       contents: write
       
+    container:
+      image: registry.altlinux.org/p11/amd64/generic:latest
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,9 +32,39 @@ jobs:
           
       - name: Install system dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev librsvg2-dev patchelf libgtk-3-dev libayatana-appindicator3-dev libfuse2 squashfs-tools \
-            libasound2-dev libflite1 libflite-dev libavif-dev libjxl-dev libhidapi-dev libbacktrace-dev liblz4-dev libzstd-dev
+          apt-get update
+          apt-get install -y \
+            webkit2gtk-4.1-devel \
+            librsvg-devel \
+            patchelf \
+            gtk3-devel \
+            libayatana-appindicator3-devel \
+            fuse \
+            squashfs-tools \
+            alsa-lib-devel \
+            flite \
+            libavif-devel \
+            libjxl-devel \
+            hidapi-devel \
+            liblz4-devel \
+            libzstd-devel \
+            libsecret-devel \
+            libX11-devel \
+            libXext-devel \
+            libXcursor-devel \
+            libXdamage-devel \
+            libXfixes-devel \
+            libXrandr-devel \
+            libXi-devel \
+            libxkbcommon-devel \
+            mesa-libGL-devel \
+            mesa-libEGL-devel \
+            gstreamer1.0-devel \
+            gstreamer1.0-plugins-base \
+            gstreamer1.0-plugins-good \
+            gstreamer1.0-plugins-bad \
+            gstreamer1.0-plugins-ugly \
+            gstreamer1.0-libav
           
       - name: Install npm dependencies
         run: npm install
